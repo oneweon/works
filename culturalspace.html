@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="jquery-3.7.1.min.js"></script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        ul{
+            list-style: none;
+        }
+        a:visited, a:link{
+            color: #000;
+            text-decoration: none;
+        }
+
+        .wrap{
+            width: 90%;
+            max-width: 1440px;
+            margin: auto;
+            box-sizing: border-box;
+            padding: 30px;
+            /* background-color: gainsboro; */
+        }
+        .wrap .search{
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .search h3{
+            margin-bottom: 20px;
+        }
+        .search label{
+            /* font-size: 14px; */
+            font-weight: bold;
+            margin-right: 4px;
+        }
+        .search input, .search select{
+            box-sizing: border-box;
+            height: 24px;
+            vertical-align: middle;
+            margin-right: 8px;
+            width: 120px;
+        }
+        .search input{
+            width: 200px;
+            padding: 0 4px;
+        }
+        .search button{
+            box-sizing: border-box;
+            height: 24px;
+            vertical-align: middle;
+            width: 80px;
+            border: 0;
+            outline: 0;
+            background-color: black;
+            color: white;
+            border-radius:2px;
+            cursor: pointer;
+        }
+        .search button:active{
+            background-color: rgb(80, 80, 80);
+        }
+        .wrap .list{
+            width: 100%;
+            background-color: white;
+        }
+        .list ul{
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .list li{
+            width: 100%;
+            display: flex;
+            cursor: pointer;
+        }
+        .list p{
+            text-align: center;
+            padding: 10px 0;
+            text-wrap: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .list p:nth-child(1){
+            width: 5%;
+        }
+        .list p:nth-child(2){
+            width: 15%;
+        }
+        .list p:nth-child(3){
+            width: 30%;
+        }
+        .list p:nth-child(4){
+            width: 25%;
+        }
+        .list p:nth-child(5){
+            width: 25%;
+        }
+        .list li:not(.stand):nth-child(2n-1){
+            background-color: rgb(245, 245, 245);
+        }
+        .list .stand{
+            font-weight: bold;
+            border-bottom: 1px solid black;
+            background-color: gray;
+            color: white;
+        }
+        .list li:not(.stand):hover{
+            background-color: rgba(173, 216, 230, 0.3);
+        }
+        .list .nosearch{
+            text-align: center;
+            color: gray;
+            font-style: italic;
+            margin: 24px 0;
+        }
+
+        .popBg{
+            position: fixed;
+            top:0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,.8);
+            z-index: 100;
+            display: none;
+        }
+        .pop{
+            width: 800px;
+            max-height: 80%;
+            overflow-y: scroll;
+            scrollbar-width: none;
+            background-color: white;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 40px 0;
+            display: none;
+            z-index: 150;
+        }
+        .pop .profile{
+            width: 80%;
+            height: 200px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .profile .img{
+            width: 200px;
+            height: 200px;
+        }
+        .profile .info{
+            width: 400px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .info span{
+            display: block;
+            color: gray;
+        }
+        .info .link{
+            display: block;
+            width: 200px;
+            height: 40px;
+            border: 0;
+            outline: 0;
+            background-color: gray;
+            border-radius: 4px;
+            margin-top: 50px;
+        }
+        .info .link a{
+            display: block;
+            text-align: center;
+            line-height: 40px;
+            width: 100%;
+            height: 100%;
+            color: white;
+            font-size: 16px;
+        }
+        .pop .main{
+            width: 80%;
+            margin: 30px auto;
+        }
+        .main h3{
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .main ul{
+            width: 100%;
+        }
+        .main li{
+            display: flex;
+            border: 1px solid black;
+            border-bottom: 0;
+            box-sizing: border-box;
+        }
+        .main p{
+            line-height: 150%;
+            padding: 5px 10px;
+            box-sizing: border-box;
+            max-width: calc(100% - 101px);
+            display: flex;
+            align-items: center;
+        }
+        .main li:last-child{
+            border-bottom: 1px solid black;
+        }
+        .main h4{
+            width: 100px;
+            height: auto;
+            padding: 15px 0;
+            text-align: center;
+            background-color: lightblue;
+            border-right: 1px solid black;
+        }
+        .pop .close{
+            width: 150px;
+            height: 40px;
+            margin-left: 50%;
+            transform: translateX(-50%);
+        }
+        .pop .noinfo{
+            color: rgb(167, 167, 167);
+        }
+
+
+
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+        <div class="search">
+            <h3>서울시 문화공간 검색</h3>
+            <label for="subjcode">주제분류</label>
+            <select id="subjcode">
+                <option value="">전체</option>
+                <option value="공연장">공연장</option>
+                <option value="도서관">도서관</option>
+                <option value="문화예술회관">문화예술회관</option>
+                <option value="문화원">문화원</option>
+                <option value="미술관&#47;갤러리">미술관&#47;갤러리</option>
+                <option value="박물관&#47;기념관">박물관&#47;기념관</option>
+                <option value="기타">기타</option>
+            </select>
+            <label for="addr">주소</label>
+            <select id="addr">
+                <option value="">전체</option>
+                <option value="강남구">강남구</option>
+                <option value="강동구">강동구</option>
+                <option value="강북구">강북구</option>
+                <option value="강서구">강서구</option>
+                <option value="관악구">관악구</option>
+                <option value="광진구">광진구</option>
+                <option value="구로구">구로구</option>
+                <option value="금천구">금천구</option>
+                <option value="노원구">노원구</option>
+                <option value="도봉구">도봉구</option>
+                <option value="동대문구">동대문구</option>
+                <option value="동작구">동작구</option>
+                <option value="마포구">마포구</option>
+                <option value="서대문구">서대문구</option>
+                <option value="서초구">서초구</option>
+                <option value="성동구">성동구</option>
+                <option value="성북구">성북구</option>
+                <option value="송파구">송파구</option>
+                <option value="양천구">양천구</option>
+                <option value="영등포구">영등포구</option>
+                <option value="용산구">용산구</option>
+                <option value="은평구">은평구</option>
+                <option value="종로구">종로구</option>
+                <option value="중구">중구</option>
+                <option value="중랑구">중랑구</option>
+            </select>
+            <label for="fac_name">문화시설명</label>
+            <input type="text"  id="fac_name">
+            <button class="btn">검색</button>
+        </div>
+        <div class="list">
+            <ul>
+                <li class="stand">
+                    <p>번호</p>
+                    <p>주제분류</p>
+                    <p>문화시설명</p>
+                    <p>주소</p>
+                    <p>전화번호</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="popBg">
+    </div>
+    <div class="pop">
+        <div class="profile">
+            <div class="img"></div>
+            <div class="info">
+                <span class="subjcode"></span>
+                <h2 class="fac_name"></h2>
+                <span class="addr"></span>
+                <button class="link"><a href="#" target="_blank">홈페이지 바로가기 →</a></button>
+            </div>
+        </div>
+        <div class="main">
+            <h3>상세 정보</h3>
+            <ul>
+                <li>
+                    <h4>개관일자</h4>
+                    <p class="open_day"></p>
+                </li>
+                <li>
+                    <h4>관람시간</h4>
+                    <p class="openhour"></p>
+                </li>
+                <li>
+                    <h4>무료구분</h4>
+                    <p class="entrfree"></p>
+                </li>
+                <li>
+                    <h4>관람료</h4>
+                    <p class="entr_fee"></p>
+                </li>
+                <li>
+                    <h4>전화번호</h4>
+                    <p class="phne"></p>
+                </li>
+                <li>
+                    <h4>휴관일</h4>
+                    <p class="closeday"></p>
+                </li>
+                <li>
+                    <h4>기타사항</h4>
+                    <p class="etc_desc"></p>
+                </li>
+            </ul>
+        </div>
+        <button class="close">닫기</button>
+    </div>
+
+    <script>
+        const file = {
+            "DESCRIPTION" : {"SUBJCODE":"주제분류","GREEN":"GREEN","FAC_DESC":"시설소개","OPENHOUR":"관람시간","BUSSTOP":"버스정거장","ENTRFREE":"무료구분","CLOSEDAY":"휴관일","AIRPORT":"공항버스","ADDR":"주소","RED":"RED","HOMEPAGE":"홈페이지","NUM":"번호","FAX":"팩스번호","FAC_NAME":"문화시설명","BLUE":"BLUE","ETC_DESC":"기타사항","SEAT_CNT":"객석수","SUBWAY":"지하철","PHNE":"전화번호","X_COORD":"위도","MAIN_IMG":"대표이미지","Y_COORD":"경도","ENTR_FEE":"관람료","YELLOW":"YELLOW","OPEN_DAY":"개관일자"},
+            "DATA" : [
+                {"y_coord":"127.00977973484339","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=04ae3506f18f4fb39a8553095364f973&thumb=Y","addr":"서울특별시 중구 을지로 281","x_coord":"37.56735731522952","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":"동대문역사문화공원, 광희동, 을지로 6가 국립중앙의료원","closeday":"1월 1일 / 설날 / 추석 당일 * 공간별 상이","fax":"02-2153-0010","green":null,"subjcode":"기타","homepage":"http://www.ddp.or.kr","fac_desc":"<h5 class=\"tit_chapter\" style=\"text-align: center; padding: 0px; margin: 0px 0px 20px;\" arial,=\"\" vernade,=\"\" 돋움,=\"\" dotum,=\"\" noto=\"\" kr?,=\"\" sans-serif;?=\"\" sans=\"\"><span style=\"font-size: 18pt;\">‘Amazing! Tomorrow’DDP(동대문디자인플라자)에 오신 것을 환영합니다.</span></h5><h5 class=\"tit_chapter\" style=\"padding: 0px; margin: 0px 0px 20px;\" arial,=\"\" vernade,=\"\" 돋움,=\"\" dotum,=\"\" noto=\"\" kr?,=\"\" sans-serif;?=\"\" sans=\"\"><span style=\"font-size: 18px; font-weight: 300;\">DDP는 대한민국 서울특별시 동대문역사문화공원역에 위치한 복합 문화 공간입니다. 2014년 3월 21일 개관한 이래 DDP에서는 각종 전시, 패션쇼, 신제품발표회, 포럼, 컨퍼런스 등 다양한 문화 행사가 진행되어 왔습니다. DDP는 디자인 트렌드가 시작되고 문화가 교류하는 장소입니다. 세계 최초 신제품과 패션 트렌드를 알리고, 새로운 전시를 통해 지식을 공유하며, 다양한 디자인 체험이 가능한 콘텐츠로 운영됩니다. 이러한 활동을 통해 DDP는 아시아로, 세계로 향하는 ‘디자인·패션산업의 발신지’의 역할을 할 것입니다.</span></h5><div><span style=\"font-size: 18px;\"><b>개관 이후 DDP는</b></span><br></div><div><div style=\"\"><span style=\"font-size: 18px;\">1. 연간 천만명 이상이 방문하는 <b>서울의 디자인 성지</b></span></div><div style=\"\"><span style=\"font-size: 18px;\">- 2018년 이후 연간 천만명 이상 방문, 일평균 3만명</span></div><div style=\"\"><span style=\"font-size: 18px;\">2. 뉴욕타임스 선정 <b>\"꼭 가봐야 할 세계 명소\"</b></span></div><div style=\"\"><span style=\"font-size: 18px;\">- 한국관광공사 선정 한국관광지 100선, LA타임스 \"서울의 대표 관광지\"</span></div><div style=\"\"><span style=\"font-size: 18px;\">3. 여성 최초 프리츠커 건축상 수상 <b>자하 하디드의 유작</b></span></div><div style=\"\"><span style=\"font-size: 18px;\">- 칼 라거펠트, 알레산드로 멘디니, 장 폴고티에 등 세계적 디자인명사들의 사랑을 받은 공간</span></div><div style=\"\"><span style=\"font-size: 18px;\">4. <b>매년 100건 이상의 전시, 행사 개최</b></span></div><div style=\"\"><span style=\"font-size: 18px;\">- 샤넬, 루이비통 등 명품 브랜드가 예술 활동을 벌이는공간</span></div><div style=\"\"><span style=\"font-size: 18px;\">- BMW, 벤츠 등 신차 런칭 발표의 주요 공간</span></div><div style=\"\"><span style=\"font-size: 18px;\">5. <b>동대문상권과의 상생을 위한 끊임없는 노력과 변신</b></span></div><div style=\"\"><span style=\"font-size: 18px;\">- 동대문 지역과 콜라보한 행사와 상품 지속개발</span></div><div style=\"\"><span style=\"font-size: 18px;\">- 개관 이후 지하철 유동인구 12% 이상 상승(서울교통공사)</span></div><div style=\"\"><span style=\"font-size: 18px;\"><br></span></div><div style=\"\"><span style=\"font-size: 18px;\"><b>DDP 베스트 플레이스</b></span></div><div style=\"\"><span style=\"font-size: 18px;\"><b>1. DDP 뮤지엄</b> :&nbsp;</span><span style=\"font-size: 18px;\">디자인 가치를 전 세계에 알리는 구심점</span></div><div style=\"\"><span style=\"font-size: 18px;\">DDP 뮤지엄이 ‘서울특별시 등록 미술관 제29020-01호’ 1종 공립미술관으로 등록되었습니다.</span></div><div style=\"\"><span style=\"font-size: 18px;\">이번 공립미술관 등록은 대한민국 유일의 공립 디자인 뮤지엄으로서 서울의 디자인 가치를 발굴, 연구, 전시해 국내 디자인 영역을 확장하고 동시대 글로벌 디자인 콘텐츠를 선보이며 DDP가 창조 자원의 발신지로 자리하는 주요한 변곡점이 될 것입니다.</span></div><div style=\"\"><span style=\"font-size: 18px;\"><b>2. 디자인 쇼룸, 디자인홀</b> :&nbsp;</span><span style=\"font-size: 18px;\">예술과 기술로 하나되는 스페이스 DDP 45133</span></div><div style=\"\"><span style=\"font-size: 18px;\">동대문이 지닌 역사적·문화적·사회적·경제적 토대 위에 새로운 미래적 가치와 비전을 더한 새로운 시도를 시민과 함께 만듭니다.&nbsp;</span><span style=\"font-size: 18px;\">DDP를 둘러싼 총 45,133개의 알루미늄 패널이 저마다 다른 모습을 하는 것은 마치 우주를 구성하는 모든 존재의 다양성과 유사합니다. 그리고, 이런 다양성과 조화는 시각적, 공간적 아름다움 뿐만 아니라, 똑같은 존재가 단 하나도 없는 우리 인간과 같은 구성원들이 만들어내는 거대한 우주를 닮았습니다.</span></div><div style=\"\"><span style=\"font-size: 18px;\">서로 다른 다양성과 그 조화를 통해 만들어내는 우주는 바로 DDP 45133이 추구하고자 하는 새로운 공간이며 지향하는 가치입니다.&nbsp;</span><span style=\"font-size: 18px;\">모든 존재가 어우러져 하나의 우주(Space)를 구성하듯 함께 참여하여 만들어가는 디지털 스페이스 DDP 45133 DDP 45133 NFT 전시는 DDP 온·오프라인 융합으로 예술과 기술로 하나되는 스페이스입니다.</span></div><div style=\"\"><span style=\"font-size: 18px;\">첫 시작을 DDP의 철학이 담긴 고 자하하디드의 작품으로 시작합니다. (전시기간: '23.12.21.~'24.11.30.)</span></div><div style=\"\"><span style=\"font-size: 18px;\"><b>3. DDP디자인스토어</b> :&nbsp;</span><span style=\"font-size: 18px;\">더 나은 서울 생활의 품격과 일상을 위한 곳</span></div><div style=\"\"><span style=\"font-size: 18px;\">서울디자인재단에서 운영하는 DDP디자인스토어는 우수한 디자인 상품을 발굴하고, 온·오프라인 플랫폼을 통해서 디자이너들에게 마케팅과 홍보를 지원하는 사업입니다.서울 디자인의 우수성 확산 및 DDP디자인스토어 브랜드의 국제적 인지도 확립을 위해 서울 라이프스타일의 가치를 재발견하고 디자인을 통한 정체성을 확립하고 있습니다.</span></div><div style=\"\"><span style=\"font-size: 18px;\"><b>4. 서울-온</b> :&nbsp;</span><span style=\"font-size: 18px;\">비대면 행사를 위한 공간</span></div><div style=\"\"><span style=\"font-size: 18px;\">서울-온은 코로나19 장기화로 증가한 화상회의 및 비대면 행사를 위한 공간입니다. 초대형 디스플레이와 고해상도 영상장비, 최신 음향？조명 설비를 갖추고 있으며 부속시설로 일반대기실, VIP대기실, 라커룸, 통역실, 조정실, 라운지가 있습니다. 화상회의뿐만 아니라 토크쇼, 포럼, 강연 등 다양한 형태의 온·오프라인 행사를 개최할 수 있는 공간입니다.</span></div><div style=\"\"><span style=\"font-size: 18px;\"><b>5. 서울라이트</b> :&nbsp;</span><span style=\"font-size: 18px;\">시민참여로 힐링과 위로의 디자인 감성을 담다</span></div><div style=\"\"><span style=\"font-size: 18px;\">서울을 대표하는 건축물인 동대문디자인플라자(DDP)는 평소에는 은빛으로 자신만의 컬러로 존재감을 드러내지만 밤이 되면 굴곡진 은빛 표면이 캔버스가 됩니다. 압도적인 규모와 눈을 뗄 수 없는 역동성이 가득한 ‘서울라이트’는 지금 우리나라를 넘어 세계의 눈을 사로잡고 있습니다. DDP가 서울의 문화자산으로 성장하고 동대문을 중심으로 지역 경제와 경제 활성화에 기여하고 있습니다.</span></div><div style=\"\"><span style=\"font-size: 18px;\"><br></span></div><div style=\"\"><span style=\"font-size: 18px;\">&nbsp;</span></div><div style=\"font-size: 18px; font-weight: 300;\"><br></div></div>","num":1,"red":null,"openhour":null,"entrfree":"무료","blue":"N13, 105,152,301,N13,N16,N30,105,144,261,301,407,420","phne":"02-2153-0000","fac_name":"DDP(동대문디자인플라자)"},
+                {"y_coord":"127.054416929987","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=d715fcc0463c4991a77ff3127836fb39&thumb=Y","addr":"서울특별시 성동구 연무장7길 11 2층","x_coord":"37.5437897702564","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"프로그램별 상이","subway":null,"busstop":null,"closeday":"공연에 따라 다름","fax":null,"green":null,"subjcode":"공연장","homepage":"https://www.wooranfdn.org/about/space.jsp","fac_desc":"<div><span style=\"font-size: 12pt;\">비움으로 완성한 채움의 공간</span></div><div><span style=\"font-size: 12pt;\">볕 경, 그림자 영으로 불리는 한자어 ‘景’에는 사물을 조화롭게 비추는 ‘빛’과 그 빛이 만들어낸 ‘그림자’, 그리고 그들이 함께 어우러지는 ‘풍경’이라는 의미가 모두 담겨져 있습니다.</span></div><div><span style=\"font-size: 12pt;\">우란문화재단은 각 공간명에 공간의 특성을 지우고 ‘경景’이라는 명칭을 사용하여 선입견 없이 각 공간에서 자유롭게 펼쳐질 예술적 풍경에 대한 기대감을 담았습니다.</span></div><div><span style=\"font-size: 12pt;\"><br></span></div><div><span style=\"font-size: 12pt;\">1층에서 3층까지 각 층에 위치한 우란문화재단의 주요 공간은 각각 우란1경, 우란2경, 우란3경, 우란4경, 우란5경으로 불리게 됩니다. 객석과 무대의 경계를 허물고, 전시와 공연이라는 기능마저 최소화한 이 ‘무제의 공간’은 매번 새롭게 해석되며, 무한한 가능성의 공간으로 거듭납니다.</span></div><div><span style=\"font-size: 12pt;\"><br></span></div><div><span style=\"font-size: 12pt;\">우란문화재단 2층에 위치한 우란2경은 무대와 객석이 고정되지 않아 자유로운 구획이 가능한 공간입니다.&nbsp; (대관불가)</span></div>","num":2,"red":null,"openhour":null,"entrfree":"유료","blue":null,"phne":"070-4244-3812","fac_name":"우란2경"},
+                {"y_coord":"126.93311834754995","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000101433&thumb=Y","addr":"서울특별시 은평구 진관2로 111-51","x_coord":"37.63723039689538","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"매주 금요일과 법정공휴일","fax":null,"green":"(지선) 7211, (지선) 7723","subjcode":"도서관","homepage":"http://www.enlib.or.kr/","fac_desc":"<div><span style=\"font-size: 14pt;\">은평구 진관동에 위치한 은평뉴타운도서관은 정보의 원활한 접근과 맞춤서비스, 평생교육, 창의적 독서 환경 제공 등 지역 주민 누구나 소통하고 정보를 나눌 수 있는 공간이자 시대의 변화에 발맞추어 새롭게 등장하는 미디어 정보를 제공하고 주민들의 퍼블릭 액세스를 실현하기 위한 도서관과 미디어센터가 결합한 복합 문화공간 기능을 수행하고 있습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">&nbsp;개관연장사업을 통한 야간독서문화프로그램, 학교 연계 독서진흥사업, 1사서 1동아리, ‘미디어 리터러시 교육’, 지역주민들이 직접 만들어나가는 라디오 팟캐스트 은평FM, 새로운 형태의 북큐레이션 대책있는 사서들, 시니어 대상 콘텐츠 제작 교육 지원, 웹툰창작체험 교육, 어린이 꾸러기 기자단 등 어린이/ 청소년들에게는 전문교육을 통한 인재양성과 성인, 노인 및 정보소외계층에는 역량 강화를 통한 지역 커뮤니티 활성화를 위해 앞장서 나가고 있습니다.</span></div>","num":3,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"(02) 6341-6400","fac_name":"구립은평뉴타운도서관"},
+                {"y_coord":"126.999528450321","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=43deea57057a4674bf968f5c10e0b29c&thumb=Y","addr":"서울특별시 종로구 창경궁로 253-7","x_coord":"37.5844227357062","open_day":null,"seat_cnt":null,"yellow":"15","etc_desc":null,"airport":"14","entr_fee":null,"subway":"12","busstop":"13","closeday":"없음","fax":null,"green":"16","subjcode":"공연장","homepage":"https://www.daehakroticket.com/ticket.do?command=hall_view&tht_code=20200304001","fac_desc":"<p style=\"text-align: center; \" align=\"center\"><span style=\"font-size: 14pt;\">연극, 뮤지컬, 다양한 창작활동을 위한 공연장입니다.</span><br></p>","num":4,"red":"18","openhour":null,"entrfree":"무료","blue":"17","phne":"02-6085-0015","fac_name":"씨어터쿰"},
+                {"y_coord":"127.080267103033","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000101437&thumb=Y","addr":"서울 노원구 중계로 181 노원문화예술회관","x_coord":"37.6502368524442","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"행사별 상이","subway":"4호선 상계역 : 4번 출구 - 1143번, 1140번 버스(노원문화예술회관 하차) / 1142번, 1224번 버스(은행사거리 하차 후 도보)","busstop":null,"closeday":"행사 일정에 따름","fax":null,"green":null,"subjcode":"문화예술회관","homepage":"https://www.nowonarts.kr/","fac_desc":"<div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 14pt;\">노원문화예술회관은 중계로 181 불암초등학교 맞은편에 위치하고 있으며 지상 6층, 지하 3층, 연면적 13,167㎡(3,983평) 규모에 608석(일반 600석, 장애인석 8석)의</span></div><div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 14pt;\">대공연장, 288석(일반석 284석, 장애인석 4석)의 소공연장, 스카이라운지, 전시실, 다목적실, 잔디광장의 야외무대, 기타 공연부대시설 등을 갖춘 서울 동북부 최고의 문화예술공간입니다.</span></div>","num":5,"red":null,"openhour":null,"entrfree":"유료","blue":null,"phne":"02-2289-3425","fac_name":"노원문화예술회관"},
+                {"y_coord":"126.99917120271677","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000101449&thumb=Y","addr":"서울특별시 종로구 혜화로 35 지하 1층","x_coord":"37.58868965585108","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"프로그램별 상이","subway":null,"busstop":null,"closeday":"홈페이지 참조","fax":null,"green":null,"subjcode":"공연장","homepage":"https://cafe.naver.com/dsstage","fac_desc":"<p><span style=\"font-size: 12pt;\">동숭무대 소극장</span></p>","num":6,"red":null,"openhour":null,"entrfree":"유료","blue":null,"phne":"0507-1360-2695","fac_name":"동숭무대소극장"},
+                {"y_coord":"126.891928199853","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=92236b8c63104b78b94c36c1352df569&thumb=Y","addr":"서울특별시 금천구 범안로15길 57","x_coord":"37.4688247596721","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"없음","fax":null,"green":null,"subjcode":"기타","homepage":"http://www.sfac.or.kr/artspace/artspace/geumcheon_main.do","fac_desc":"<p><span style=\"font-size: 14pt;\">금천예술공장은 2009년 인쇄공장을 리모델링하여 조성된 시각예술 전문 국제 레지던시 공간으로, 실험적인 예술을 장려하며 예술의 다양한 가치를 존중합니다. 매해 입주작가 공모를 통해 실험적이고 새로운 작업을 실현하는 시각예술가를 선발하여 레지던시 프로그램을 운영, 지원하고 있습니다. 또한 입주작가 기획전시, 오픈스튜디오, 워크숍 등의 프로그램을 진행하며 예술가, 미술 관계자, 시민이 함께 입주작가들의 작품과 작업 공간을 접할 수 있는 문화의 장을 만들고자 합니다</span></p><p><span style=\"font-size: 14pt;\"><br></span></p><p><span style=\"font-size: 18.6667px;\">[시설현황]</span></p><p><span style=\"font-size: 18.6667px;\">- 규모 : 지하 1층~ 지상 3층, 창고동(대형 작업공간)</span></p><p><span style=\"font-size: 18.6667px;\">- 면적 : 2,358㎡ (714평) / 연면적 : 3,070㎡(930평)</span></p><p></p><p><span style=\"font-size: 18.6667px;\">- 구성 : 스튜디오 19실, 호스텔 5실, 대형 전시장, 미디어랩, 워크숍룸, 창고동, 남녀샤워장, 세탁실 외</span></p>","num":7,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-807-4747","fac_name":"금천예술공장"},
+                {"y_coord":"127.042703170101","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000100154&thumb=Y","addr":"서울특별시 동대문구 회기로 56","x_coord":"37.5909928893989","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"어른 3000원 청소년, 유아 1500원","subway":null,"busstop":null,"closeday":"매주 주말 및 공휴일 ","fax":null,"green":null,"subjcode":"박물관/기념관","homepage":"http://sejongkorea.org/main/main.html","fac_desc":"<div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 14pt;\">고세종대왕의 성덕과 위업을 추모하고 보존하기 위해 1970년 세종대왕기념사업회에서 준공하였다.&nbsp;</span></div><div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 14pt;\">전시관은 한글실, 과학실, 국악실, 일대기실로 구성된다.&nbsp;</span></div><div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 14pt;\">한글실은 세종대왕 당시 펴낸 도서류를, 과학실은 과학 관계자료(금속활자 판자기, 수표측우기 등)를 전시하고 있으며,&nbsp;</span></div><div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 14pt;\">국악실은 국악악기류를 전시하고 있다. 일대기실은 김학수선생께서 수년동안 그린 '세종대왕 일대기 그림' 14폭이&nbsp;</span></div><div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 14pt;\">전시되어 있어 세종대왕의 치덕을 살펴 볼 수 있다.</span></div>","num":8,"red":null,"openhour":"09:00 ~ 18:00","entrfree":"유료","blue":null,"phne":"02-969-8851","fac_name":"세종대왕기념관"},
+                {"y_coord":"126.982711486486","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=2a25dc3699c84f7193c39ee559238a32&thumb=Y","addr":"서울 용산구 소월로 132 독일문화원","x_coord":"37.5507131461622","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":"■ 기    타 : 도서관 월~금요일 13:00~18:00","airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"매주 일요일, 공휴일","fax":null,"green":null,"subjcode":"문화원","homepage":"http://www.goethe.de/ins/kr/seo/deindex.htm","fac_desc":"<span style=\"font-size: 14pt;\">독일 문화원(괴테 인스티투트)는 해외에서의 독일어 보급과 지원, 국제 간의 문화교류 증진을 위한 공익 법인으로써 1959년 설립되었다. 독일 문화원의 주요 업무는 독일 문화를 한국에 널리 알리기 위한 음악, 영화, 미술, 문학, 춤, 학술 등 다양한 분야의 폭넓은 문화행사를 주관하고 후원하는 것이다. 도서관, 음악당, 어학강의실, 카페테리아 등 시설을 갖추고 있다. 독일유학상담도 할 수 있다.</span>","num":9,"red":null,"openhour":"09:00 ∼ 18:00","entrfree":"유료","blue":null,"phne":"02-2021-2800","fac_name":"주한독일문화원"},
+                {"y_coord":"126.972089131199","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=fb3b5669fc51483ca1662aa7c6e006a6&thumb=Y","addr":"서울특별시 중구 서소문로11길 19","x_coord":"37.5637878280982","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"공휴일","fax":"02 3702 0660","green":null,"subjcode":"문화원","homepage":"https://www.britishcouncil.kr/","fac_desc":"<span style=\"font-size: 14pt;\">영국문화원은 교육과 문화 교류를 위한 영국정부의 공식기관으로 1973년 개원하였으며, 오피스와 어학센터를 통하여 유학상담, 영어교육, 영국에 대한 각종 정보제공, 문화교류 등 다양한 서비스와 활동을 하고 있다. 특히 1999년 4월 엘리자베스 2세 영국여왕에 의하여 개관한 영국 센터는 영국에 관한 정보를 제공하는 원스톱 숍으로 영국에 관한 일반적인 정보를 비롯하여 영국의 교육, 시험, 관광, 비즈니스 등에 관한 다양한 참고 자료와 시설을 갖추고 있다.</span>","num":10,"red":null,"openhour":null,"entrfree":"유료","blue":null,"phne":"02-3702-0601","fac_name":"주한영국문화원"},
+                {"y_coord":"126.853039264745","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=73fa7f1a2485489d97593c26967dfee8&thumb=Y","addr":"서울 구로구 고척로45길 31 고척시립도서관","x_coord":"37.5053199924985","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"0","subway":null,"busstop":null,"closeday":"정보없음","fax":null,"green":null,"subjcode":"도서관","homepage":"http://gclib.sen.go.kr/","fac_desc":"<div style=\"text-align: left;\" align=\"left\"><span style=\"font-size: 14pt;\">고척도서관은 구로구 고척동 근린공원내에 위치한 공공도서관으로서 1990년 설치된 이후, 평생 교육의 장으로서 지역주민들에게 기능과 역할을 다하고 있습니다.&nbsp;</span></div><div style=\"text-align: left;\" align=\"left\"><span style=\"font-size: 14pt;\">철따라 피고 지는 고척근린공원의 아름다운 수목과 지저귀는 새들의 화음속에 오늘도 고척도서관은 성장하고 있습니다. 으로도 자료의 확충과 이용자 편의 도모, 봉사 기능의 강화로 시민생활의 질을 높이는 교육문화 기관으로서의 기능을 다하고자 합니다.</span></div><div style=\"text-align: left;\" align=\"left\"><span style=\"font-size: 12px;\"><br></span></div><div style=\"text-align: left;\" align=\"left\"><span style=\"font-size: 14pt;\">■ 정기휴관일 : 매월 둘째·넷째 수요일&nbsp;</span></div><div style=\"text-align: left;\" align=\"left\"><span style=\"font-size: 14pt;\">■ 법정공휴일 : 일요일을 제외한 관공서 공휴일. 단, 일요일과 다른 공휴일이 겹치는 경우에는 휴관함&nbsp;</span></div><div style=\"text-align: left;\" align=\"left\"><span style=\"font-size: 14pt;\">■ 임시휴관일 : 기타 도서관장이 정하는 날</span></div>","num":11,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-2615-0524","fac_name":"서울특별시교육청 고척도서관"},
+                {"y_coord":"126.966566172294","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000101551&thumb=Y","addr":"서울특별시 용산구 서빙고로 17","x_coord":"37.5269056148241","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"일, 월, 공휴일","fax":null,"green":null,"subjcode":"박물관/기념관","homepage":"https://blog.naver.com/yongsanpark_gallery","fac_desc":"<!--startfragment--><p class=\"0\"><span><span>층 전시관은 용산도시변천사와 용산참사 등 용산기지 관련 수집자료를 활용한 콘텐츠로 구성되고</span><span lang=\"EN-US\"><span lang=\"EN-US\"><font size=\"3\"> 2<span></span></font></span><font size=\"2\"></font></span></span></p><p class=\"0\"><br>\r\n\r\n</p>","num":12,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-3785-2590","fac_name":"용산도시기억전시관"},
+                {"y_coord":"127.112687934633","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=e19158c7495445b5af710070ea42f386&thumb=Y","addr":"서울 강동구 천호동 527-2","x_coord":"37.5451462595072","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"매주 월요일","fax":null,"green":null,"subjcode":"기타","homepage":"https://riverview8.co.kr","fac_desc":"<div><span style=\"font-size: 14pt;\">광진교8번가는 전세계적으로 3개밖에 존재하지 않는 교각하부 전망대입니다.</span></div><div><span style=\"font-size: 14pt;\">광진교8번가는 이러한 최고의 절경에서 공연과 전시라는 소재를 통해 다양한 문화컨텐츠를 만들어 시민들의 문화 감성을 충전하고 편안한 휴식을 즐기기 위한 시민 문화공간입니다.</span></div><div><span style=\"font-size: 14pt;\">서울시에서 제공하는 이곳, 광진교8번가의 문화와 예술공간속으로 여러분을 초대합니다.</span></div>","num":13,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-476-0722","fac_name":"광진교 8번가"},
+                {"y_coord":"127.076936195632","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=171a2e8550b5489bbf20fc511d1935e2&thumb=Y","addr":"서울특별시 노원구 동일로174길 27","x_coord":"37.6201739154268","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":"은행알 추첨기, 브라더 재봉틀, 밤섬에서 사용하였던 배 제작 도구 등 1,519점","airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"공휴일을 제외한 매주 월요일, 1월 1일 * 월요일이「관공서의 공휴일에 관한 규정」제2조에 따른 공휴일일 때에는 휴관하지 아니함","fax":null,"green":null,"subjcode":"박물관/기념관","homepage":"https://museum.seoul.go.kr/sulm/index.do","fac_desc":"<div><span style=\"font-size: 14pt;\">2019년 7월에 개관한 서울생활사박물관은 과거 서울북부지방법원과 서울북부지방검찰청이 있던 북부법조단지였습니다.</span></div><div><span style=\"font-size: 14pt;\">2010년, 북부법조단지가 이전함에 따라 해당공간이 유휴지가 됐습니다. 이에 서울시는 도시재생 사업의 일환으로, 구 북부법조단지 공간을 리모델링 하였습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">청사 이전으로 인한 유휴 공간을 활용함과 동시에 북부법조단지라는 사법적 권위를 상징하는 공간을 시민들에게 돌려주고, 시민이 중심이 되어 함께 전시를 만들고 교육프로그램을 운영할 것입니다.</span></div><div><span style=\"font-size: 14pt;\">기억과 감성을 담은 근현대 생활사 박물관으로써, 시민들이 소통하고 교감하는 동북부 복합문화공간의 중심이 될 것입니다.</span></div>","num":14,"red":null,"openhour":"09:00 ~ 18:00 (입장마감 : 17:30)","entrfree":"무료","blue":null,"phne":"02-3399-2900","fac_name":"서울생활사박물관"},
+                {"y_coord":"126.98338815886143","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000101548&thumb=Y","addr":"서울특별시 종로구 우정국로 26","x_coord":"37.57189081127559","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"연중무휴","fax":null,"green":null,"subjcode":"박물관/기념관","homepage":"https://museum.seoul.go.kr/www/intro/annexIntro/annex_gongpyeong/annex_gongpyeong_01.jsp?sso=ok","fac_desc":"<h4 class=\"tit2\"><span style=\"font-size: 16px;\">공평도시유적전시관</span></h4><h4 class=\"tit2\"><span style=\"font-size: 16px; font-weight: normal;\">2015년 공평1·2·4지구 도시환경정비사업을 추진하는 과정에서 조선 한양에서 근대 경성에 이르는 역사도시 서울의 골목길과 건물터가 온전하게 발굴되었습니다. 이에 서울시는 도시유적과 기억을 원래 위치에 전면적으로 보존하고자 공평도시유적전시관을 조성하여 2018년 9월 12일 개관하였습니다. 도심정비사업에서 발굴되는 매장문화유산를 최대한 ‘원 위치 전면 보존’한다는 ‘공평동 룰’을 적용한 첫 사례이기도 합니다.</span></h4><h4 class=\"tit2\"><span style=\"font-size: 16px; font-weight: normal;\">공평동 룰은 도심정비사업에서 발굴되는 매장문화유산를 최대한 ‘원 위치 전면 보존’한다는 원칙입니다. 이에 따라 사업 추진시 매장문화유산에 대한 전면 보존이 필요하다는 인식을 갖고 매장문화유산를 고려한 건축설계를 하고 매장문화유산 보존 면적에 따른 용적율 인센티브를 부여해서 사업시행자의 자발적인 참여를 유도하였습니다. 아울러 유적전시관 조성에 따른 가이드라인을 제시하여 서울시 총괄건축가와 협의를 하고, 이런 과정을 거쳐 조성된 전시관은 서울시에서 운영합니다.</span></h4><h4 class=\"tit2\"><span style=\"font-size: 16px; font-weight: normal;\">2014~15년에 걸쳐 실시된 발굴조사를 통해 조선 초기부터 일제강점기에 이르기까지 총 108개 동 건물지와 중로, 골목길 등의 유구와 1,000여 점이 넘는 생활유물이 확인되었습니다. 그 중 유구의 상태가 가장 온전히 남아있는 16~17세기 Ⅳ문화층 유구를 전시관 내부로 이전하여 복원하였습니다.</span></h4><h4 class=\"tit2\"></h4><h4 class=\"tit2\"><span style=\"font-size: 16px; font-weight: normal;\">이중 전동 큰 집, 골목길 ㅁ자 집, 이문안길 작은 집의 3개 건물지가 핵심 콘텐츠로 각 건물지별로 1/10 축소 모형, 가상현실인 VR체험, 출토된 유구 위에 1:1 복원 모형 등 다양한 전시기법을 통해 16~17세기 한양의 모습을 보여드리고 있습니다. 이와 함께 조선시대부터 현대까지 사용했던 골목길이 확인되어 이문안길과 전동 골목길을 직접 걸으면서 조선시대에 와 있는 느낌을 직접 체험하실 수 있습니다.</span></h4><h4 class=\"tit2\"><span style=\"font-size: 12pt;\"><br></span></h4><h4 class=\"tit2\"><span style=\"font-size: 12pt;\">운영 개요</span></h4><ul class=\"bul_dot\"><li style=\"font-size: 12pt;\"><span style=\"font-size: 12pt;\">대상 : </span><b><span style=\"font-size: 12pt;\">제한 없음(어린이 및 노약자 방문시 보호자 동반 필수)</span></b></li><li style=\"font-size: 12pt;\"><span style=\"font-size: 12pt;\">해설정원\t </span><ul class=\"bul_hyphen\"><li style=\"font-size: 12pt;\"><b><span style=\"font-size: 12pt;\">개인 : 각 회차별 15명 정원</span></b></li><li style=\"font-size: 12pt;\"><b><span style=\"font-size: 12pt;\">단체 : 30명 정원</span></b><span style=\"font-size: 12pt;\">\t\t </span><p class=\"desc_info\"><span style=\"font-size: 12pt;\" #b22222\"=\"\">☎02-724-0215, 0135)</span></p></li></ul></li><li style=\"font-size: 12pt;\"><span style=\"font-size: 12pt;\">장소 : 센트로폴리스 빌딩 지하1층 공평도시유적전시관 입구 안내데스크 앞</span></li><li><span style=\"font-size: 12pt;\">전시 해설 일정\t </span><ul class=\"bul_hyphen\"><li style=\"font-size: 12pt;\"><b><span style=\"font-size: 12pt;\">한국어 정기해설 : 약 50분 해설</span></b></li><li><span style=\"color:>영어, 일본어 전시 해설 가능하오니 원하시는 개인, 단체는 안내데스크에 신청</span>하여 주시기 바랍니다. (안내데스크 ☎02-724-0135)\t\t <p class=\" desc_info\"=\"\"><span style=\"font-size: 12pt;\">※ 외국어 해설은 당일 전시관 사정에 따라 안내 할 수 없는 언어가 있을 수 있으니 </span><u><span style=\"font-size: 12pt;\">반드시 안내데스크에 일정, 시간 등 확인하시고 신청</span></u><span style=\"font-size: 12pt;\">바랍니다.</span><p></p></span></li></ul></li></ul>","num":15,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-724-0135","fac_name":"공평도시유적전시관"},
+                {"y_coord":"126.964253937947","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000101553&thumb=Y","addr":"서울특별시 종로구 창의문로10길 11","x_coord":"37.5938781052674","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"개별 확인","fax":null,"green":null,"subjcode":"미술관/갤러리","homepage":"http://www.magmasup.com/?page_id=21521","fac_desc":"<span style=\"font-size: 14pt;\">김영옥만다라작품을 통해</span><div><br></div><div><span style=\"font-size: 14pt;\">치유ㆍ회복ㆍ성장 그리고 자기완성을 느낀다.</span></div><div><br></div><div><span style=\"font-size: 14pt;\">ㆍ전시활동</span></div>","num":16,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"정보없음","fac_name":"김영옥 미술관"},
+                {"y_coord":"126.9760053","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=580516baeec44af59eafc7a1efc64ff0&thumb=Y","addr":"서울 종로구 세종대로 175","x_coord":"37.5726241","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"프로그램별 상이","subway":null,"busstop":null,"closeday":"연중무휴","fax":null,"green":null,"subjcode":"공연장","homepage":"https://www.sejongpac.or.kr","fac_desc":"<p class=\"mt20\" style=\"line-height: 1.8;\"><span style=\"font-size: 12pt;\">세종문화회관은 1961년 우남회관으로 출발해, 1972년 화재로 소실된 시민회관의 뒤를 이어 1978년 4월 14일 개관하였습니다.</span></p><p class=\"mt20\" style=\"line-height: 1.8;\"><span style=\"font-size: 12pt;\">세계 유수의 공연장으로 인정받는 한국 공연예술의 등용문이자 국제공연예술의 유일한 통로였고 70 ~ 80년대에는 한국 순수예술의 요람이었습니다.</span></p><p class=\"mt20\" style=\"line-height: 1.8;\"><span style=\"font-size: 12pt;\">이처럼 한국 공연예술계의 살아있는 역사이자 예술을 사랑하는 사람들의 추억의 공간이며 한국을 대표하는 문화예술기관으로 20여 년간 그 명성을 유지 해오던&nbsp;</span><span style=\"font-size: 12pt;\">세종문화회관은 1999년 21세기를 앞두고 또 한번의 도약을 위해 재단법인으로 변했습니다.&nbsp;</span></p><p class=\"mt20\" style=\"line-height: 1.8;\"><span style=\"font-size: 12pt;\">재단법인 세종문화회관의 출범은 창의성과 자율성이 강조되는 민간문화예술 활성화의 신호탄이자 한국문화예술의 세계화를 향한 첫걸음 이었습니다.</span></p><p class=\"mt20\" style=\"line-height: 1.8;\"><span style=\"font-size: 12pt;\">이후 세종문화회관은 대극장 리모델링에 이어 세종 체임버홀, 세종 M씨어터, 세종 S씨어터 등 하드웨어의 개편과 함께 예술로 동행, 세종예술아카데미 운영 등으로 시민과 함께하는 문화예술의 보급을 사명으로 삼고 있습니다.</span></p><p class=\"mt20\" style=\"line-height: 1.8;\"><span style=\"font-size: 12pt;\">문화예술인들에겐 창작과 발표의 공간으로 문화를 사랑하는 대중들에게 아름다움과 자긍심을 심어줄 복합공간으로 언제나&nbsp;</span><span style=\"font-size: 12pt;\">서울시민들과 함께할 것입니다.</span></p>","num":17,"red":null,"openhour":null,"entrfree":"유료","blue":null,"phne":"02-399-1000","fac_name":"세종문화회관"},
+                {"y_coord":"127.012772246644","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=f040869861c241d3ba37a62af9760a0e&thumb=Y","addr":"서울 도봉구 삼양로 556 도봉도서관","x_coord":"37.6525474596619","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":"■ 중학생 이상 누구나 자료의 열람 및 대출이 가능합니다.\r\n대출된 자료를 예약할 수 있습니다.\r\n도서관 자료의 복사가 가능합니다.\r\n청소년 권장도서 목록을 게시하고 있습니다.","airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"매월 두 번째, 네 번째 수요일 법정 공휴일(국경일 등 관공서의 휴무일)","fax":"02-991-3674","green":null,"subjcode":"도서관","homepage":"http://dblib.sen.go.kr/","fac_desc":"<div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 18.6667px;\">도봉도서관은 서울의 명산인 북한산 기슭에 자리잡고 있어 자연경관이 좋으며, 대중교통 이용이 편리하고&nbsp;</span></div><div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 18.6667px;\">인근에는 백운초등학교와 덕성여대가 함께 있어 지역 주민들의 많은 사랑을 받고 있습니다.&nbsp;</span></div><div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 18.6667px;\"><br></span></div><div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 18.6667px;\">도봉도서관은 1981년 개관 현재 201,721권의 장서를 보유하고 있으며 항상 지역주민과 같이 호흡을 같이하는&nbsp;</span></div><div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 18.6667px;\">도서관이 되기 위해 다양한 자료와 정보를 수집하여 제공하고 각종 교육, 문화 프로그램을 개발하여 지역주민</span></div><div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 18.6667px;\">들에게 널리 보급해 드리는데 최선을 다하고 있습니다.</span></div>","num":18,"red":null,"openhour":null,"entrfree":"유료","blue":null,"phne":"02-6714-7400","fac_name":"서울특별시교육청 도봉도서관"},
+                {"y_coord":"126.958036465507","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=a56628300474441382016ed4bef5764c&thumb=Y","addr":"서울특별시 용산구 양녕로 445","x_coord":"37.5176638307111","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"0","subway":null,"busstop":null,"closeday":"매주 월요일","fax":null,"green":null,"subjcode":"기타","homepage":"http://nodeul.org/","fac_desc":"<p style=\"line-height: 1.8;\"><span style=\"font-size: 14pt;\">노들섬은 바쁜 일상에서 잠시 벗어나, 온전한 나만의 시간을 보낼 수 있는 한강 위 복합문화공간입니다.</span></p><p style=\"line-height: 1.8;\"><span style=\"font-size: 14pt;\">노들섬 내 공연장, 뮤직라운지, 서가, 전시실, 야외광장 등의 공간에서 다양한 프로그램이 여러분을 기다립니다.</span></p><p style=\"line-height: 1.8;\"><span style=\"font-size: 14pt;\"><br></span></p><p style=\"line-height: 1.8;\"><span style=\"font-size: 18.6667px;\">노들섬의 지명은 한강대교 중간에 위치한 타원형 모양의 땅으로 ‘백로가 놀던 돌’이라는 뜻의 ‘노돌’에서 이름이 유래한 것으로 알려져 있습니다.<br></span><span style=\"font-size: 18.6667px;\">노들섬은 1930년대부터 1950년대까지 중지도로 불리며 한강 중심에서 백사장과 스케이트장으로 시민들에게 사랑받는 도심 속 강 문화의 중심지였습니다.<br></span><span style=\"font-size: 18.6667px;\">그러나 60~70년대 한강 개발 계획 이후 몇 차례 대규모 개발 계획안들이 무산되며 노들섬은 가깝지만 다가가기 어려운 잊혀진 섬이 되었습니다.<br></span><span style=\"font-size: 18.6667px;\">2012년 한강에서 휴식과 만남의 공간으로 사람들을 이어주던 문화 공간으로 복원하기 위한 고민이 시작되었고, 2019년 9월 노들섬은 ‘문화예술을 매개로 한 복합문화기지’로 새롭게 태어났습니다.<br></span><span style=\"font-size: 18.6667px;\">많은 이들의 꿈을 담아 함께 만들어가는 공간으로 다시 태어난 노들섬.<br></span><span style=\"font-size: 18.6667px;\">한강을 둘러싼 시민들과의 오랜 기억 위에 자연과 쉼, 문화가 흐르는 예술섬 노들에서 여러분과 함께 아름다운 기억의 순간을 만들어갑니다.</span><span style=\"font-size: 18.6667px;\"><br></span></p>","num":19,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-749-4500","fac_name":"노들섬 복합문화공간"},
+                {"y_coord":"126.8908945524","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=337abbd3e9c449f4a0253dc1847e796f&thumb=Y","addr":"서울특별시 영등포구 문래로20길 49","x_coord":"37.5168565720389","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"유료","subway":null,"busstop":null,"closeday":"매주 월요일 일요일을 제외한 법정공휴일","fax":"02)2629-8601","green":null,"subjcode":"도서관","homepage":"https://www.ydplib.or.kr/mllib/index.do","fac_desc":"<div><span style=\"font-size: 14pt;\">서울시 문래도서관은 청소년 문화강좌와 성인을 위한 생활교양강좌가 다양하게 개설되고 있는 문화도서관이다. 전체 시설 규모는 지하 1층 지상 5층 건물이며 총좌석수는 260석이다. 주요 내부시설로는 종합자료실, 고객만족센터, 어린이(유아)열람실, 문화강좌실, 전자정보열람실, 다목적실, 문화교실 등이 있다. 소장 도서로는 문학, 사회과학, 예술 분야 등의 일반도서 1만 5,635권과 어린이도서 1만 1,022권, 신문과 잡지의 연속간행물 17종을 보유하고 있다. 비도서 자료는 DVD 1,300점, CD 84점을 구비하고 있다. 도서관 주요 사업으로는 독서의 달 행사와 영화상영, 사서모임 세미나, 문학작가 파견사업, 특별 특강 등을 실시하고 있다. 도서관 주요 강좌로는 기체조 무료강좌, 영어 스토리텔링, 여름/겨울 독서교실, 메이크업 무료강좌, 동화구연 무료특강, 독서토론, 서바이벌 잉글리쉬, NIE 신문활용교육 등을 실시하고 있다. 도서관 정기휴관일은 매주 금요일과 국경일, 정부가 특별히 지정한 공휴일이다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">매일 09:00~21:00 일반열람실 평일 09:00~18:00 어린이열람실 평일 09:00~21:00 종합자료실, 전자정보열람실 주말 09:00~17:00 어린이열람실,종합자료실,전자정보열람실 월요일, 법정공휴일 휴무</span></div>","num":20,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-2629-8600","fac_name":"문래도서관"},
+                {"y_coord":"126.886564928235","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000100851&thumb=Y","addr":"서울 구로구 구로동로26길 54 구로구시설관리공단 2층","x_coord":"37.4898939687455","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"매주 화요일 및 법정공휴일","fax":null,"green":null,"subjcode":"도서관","homepage":"https://lib.guro.go.kr/#/about/gulib/lib01","fac_desc":"<p align=\"left\" style=\"text-align: left; \"><span style=\"font-size: 14pt;\"><b>시설현황</b></span></p><p align=\"left\" style=\"text-align: left; \"><span style=\"font-size: 12px;\"><br></span></p><p align=\"left\" style=\"text-align: left; \"><span style=\"font-size: 14pt;\">주소: 서울특별시 구로동로26길 54 구로구시설관리공단 2층 (구로동 741-27)</span></p><p align=\"left\" style=\"text-align: left; \"><span style=\"font-size: 12px;\"><br></span></p><p align=\"left\" style=\"text-align: left; \"><span style=\"font-size: 14pt;\">면적: 638㎡</span></p><p align=\"left\" style=\"text-align: left; \"><span style=\"font-size: 12px;\"><br></span></p><p align=\"left\" style=\"text-align: left; \"><span style=\"font-size: 14pt;\">열람석: 87석</span></p><p align=\"left\" style=\"text-align: left; \"><span style=\"font-size: 12px;\"><br></span></p><p align=\"left\" style=\"text-align: left; \"><span style=\"font-size: 14pt;\">전화번호: (02)830-1623</span></p><p align=\"left\" style=\"text-align: left; \"><span style=\"font-size: 12px;\"><br></span></p><p align=\"left\" style=\"text-align: left; \"><span style=\"font-size: 14pt;\">인스타그램: https://www.instagram.com/libdream01/</span></p><p align=\"center\" style=\"text-align: left; \">\r\n\r\n\r\n\r\n\r\n\r\n<br>\r\n</p>","num":21,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-830-1623","fac_name":"구로구립꿈나무어린이도서관"},
+                {"y_coord":"126.871394248566","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000101359&thumb=Y","addr":"서울특별시 양천구 목동동로 233 한국방송회관 2층","x_coord":"37.526981693329","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"프로그램별 상이","subway":null,"busstop":null,"closeday":"홈페이지 참조","fax":null,"green":null,"subjcode":"공연장","homepage":"http://www.kobacohall.co.kr/","fac_desc":"<p><span style=\"font-size: 14pt;\">코바코홀은 공연예술인들에게는 작품에 생명력을 주는 최상의 공간이 되고, 관객들에게는 최고의 감동을 느낄 수 있는 문화공간이 됨으로써, 공연예술의 창조성과 다양성을 증대시키는데 이바지하기 위해 노력하고 있습니다.  </span><br>\r\n\r\n<br><span style=\"font-size: 14pt;\">\r\n\r\n코바코홀은 약290석의 좌석과 300여대의 주차공간의 편의시설을 갖춘 서울 양천구 목동지역의 복합공연장으로 대중예술 및 복합장르를 수용하는 다목적 공간으로 자리매김할 것입니다. </span></p><li style=\"font-size: 14pt;\"><span style=\"font-size: 14pt;\">공연장, 준비실, 분장실, 로비 휴게공간 등으로 구성 (영상스크린, 빔 프로젝트, 음향장비 등 구비)</span></li><li style=\"font-size: 14pt;\"><span style=\"font-size: 14pt;\">극장면적 : 총 400평 이상 (지상 2, 3층)</span></li><li style=\"font-size: 14pt;\"><span style=\"font-size: 14pt;\">무 대 : 폭 16.8m, 깊이 7.2m, 천정고 7.7m</span></li><li style=\"font-size: 14pt;\"><span style=\"font-size: 14pt;\">객 석 : 상층(3층) 70석, 하층(2층) 220석 (총 객석 수 290석) 등받이가 있는 고급의자로 편안하고 안락하게 공연 관람</span></li><li style=\"font-size: 14pt;\"><span style=\"font-size: 14pt;\">부대시설 : 분장실, 화장실 등 기본시설 완비 </span></li><li><span style=\"font-size: 14pt;\">로 비 : 2층 100평 (휴게공간 50석이상의 대기의자 및 포토존 설치, 정수기 등의 기본시설 완비)</span> </li>","num":22,"red":null,"openhour":null,"entrfree":"유료","blue":null,"phne":"02-3219-5700","fac_name":"한국방송회관 코바코홀"},
+                {"y_coord":"126.999294071613","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=046cf915fb774cf78dbe330db84d63f4&thumb=Y","addr":"서울특별시 용산구 이태원로55길 60-16","x_coord":"37.5384612696435","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"전시별 상이","subway":null,"busstop":null,"closeday":"매주 월요일, 1월 1일, 설날(음력) 및 추석 당일","fax":null,"green":null,"subjcode":"미술관/갤러리","homepage":"http://leeum.samsungfoundation.org","fac_desc":"<div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 14pt;\">1965년 삼성문화재단 설립 이후 소중한 문화 유산을 보전하고 대중에게 알리고자 노력해온 삼성미술관은 2004년 서울 한남동에 미술관 건물을 신축하면서 삼성미술관 Leeum을 개관했습니다. 수준 높은 소장품 전시 및 기획전시 개최 등 그간의 괄목할만한 활동과 성과로 지금 리움은 명실공히 한국을 대표하는 미술관으로 성장하였습니다.</span></div><div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 12px;\"><br></span></div><div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 14pt;\">Leeum은 설립자의 영문 성 'Lee'와 미술관[Museum]의 'um'이 조합된 이름입니다. 2004년 개관 당시 리움의 MI 디자인을 맡은 마고 퍼먼(Margot Perman)은 고대 로마시대의 비문에 쓰인 문자를 현대적으로 변형하여 대소문자의 높이가 같은 독특한 로고를 만들었습니다. 로고의 중심을 가로지르는 타임라인 모티프는 고미술에서 현대미술로, 또 미래를 향해 나아가는 삼성미술관 Leeum의 성격을 상징합니다.</span></div>","num":23,"red":null,"openhour":null,"entrfree":"유료","blue":null,"phne":"02-2014-6900","fac_name":"리움미술관"},
+                {"y_coord":"127.113956209115","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=c0819527d8d74d619c0601364605b77f&thumb=Y","addr":"서울 송파구 위례성대로 14 19층","x_coord":"37.5165925928554","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"성인 6,000원 학생 5,000원 10인 이상 단체 1,000원 할인","subway":null,"busstop":null,"closeday":"매주 월요일","fax":null,"green":null,"subjcode":"미술관/갤러리","homepage":"https://museumhanmi.or.kr/","fac_desc":"<span style=\"font-size: 14pt;\">한미사진미술관은 한미문화예술재단이 설립한 국내최초의 사진전문미술관이다.\r\n한미문화예술재단은 지난 2002년 4월에 우수 의약품 개발을 통해 국민건강에 이바지해 온 (주)한미약품이 문화예술의 대중화와 적극적인 활동의 지원 및 활성화를 위해 창립한 공익문화예술재단으로 한미사진미술관을 통해 실질적인 재단 사업을 펼치고 있다.\r\n\r\n21세기 문화예술의 대표적인 시각매체라 할 수 있는 사진을 통해 한미사진미술관은 사진예술의 발전과 일반대중의 사진문화교육을 위해 끊임없는 노력으로 앞으로도 최선을 다할 것이다.</span>","num":24,"red":null,"openhour":"평일 10:00~19:00","entrfree":"유료","blue":null,"phne":"02-418-1315","fac_name":"뮤지엄한미 방이"},
+                {"y_coord":"126.87020687315","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=0ec10c0f679645a4b2d677d5970d1873&thumb=Y","addr":"서울특별시 양천구 목동남로 106","x_coord":"37.5107624370301","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"일요일·공휴일 : 대관시 운영","fax":null,"green":null,"subjcode":"기타","homepage":"https://www.yangcheon.go.kr/site/yangcheon/05/10504150100002023031503.jsp","fac_desc":" <p>양천구 갈산 기슭에 가족 중심 문화예술 특화 시설이 개관했다. 온 가족이 함께 공연도 즐기고 예술 문화도 즐길 수 있는 곳, ‘갈산문화예술센터’다.  지난 3월 11일 개관한 이곳은 지하 2층, 지상 4층 건물로, 공연장 ‘아이누리홀’을 비롯해 전시실, 음악실, 강의실, 주민커뮤니티 시설 등 다양한 공간들을 갖추고 있다.</p><p><br></p><p>■ 시설현황&nbsp;</p><p></p><table class=\"hType m-left0 hType-center __se_tbl_ext\" style=\"border-collapse: collapse; border-spacing: 0px; table-layout: auto; width: 1030px; margin-top: 10px; color: rgb(85, 85, 85); font-family: S-CoreDream, 'Noto Sans KR', '맑은 고딕', 'Malgun Gothic', 'Nanum Gothic', '나눔 고딕', sans-serif; font-size: 16px; height: 207px; margin-left: 0px !important; border-width: 1px 1px 0px 0px !important; border-right-style: solid !important; border-color: rgb(201, 211, 223) rgb(201, 211, 223) transparent transparent !important; border-bottom-style: initial !important; border-top-style: solid !important; border-left-style: initial !important;\"><caption style=\"position: absolute; top: 0px; left: 0px; width: 0px; height: 0px; margin: 0px; padding: 0px; background-image: none; background-position: initial; background-size: initial; background-repeat: initial; background-attachment: initial; background-origin: initial; background-clip: initial; border: 0px; font-size: 0px; line-height: 0; letter-spacing: 0px;\">대관시설</caption><thead><tr><th class=\"pe_pU NamoSE_border_show\" scope=\"col\" style=\"padding: 12px 0px; border-left: 1px solid rgb(201, 211, 223) !important; background-color: rgb(241, 248, 252); color: rgb(0, 0, 0); font-weight: 500; vertical-align: middle; border-top: 1px solid rgb(0, 0, 0); border-right: 0px transparent !important; border-bottom: 1px solid rgb(187, 187, 187); text-align: center; line-height: 1.3em;\">구분</th><th class=\"pe_pU NamoSE_border_show\" scope=\"col\" style=\"padding: 12px 0px; border-left: 1px solid rgb(201, 211, 223) !important; background-color: rgb(241, 248, 252); color: rgb(0, 0, 0); font-weight: 500; vertical-align: middle; border-top: 1px solid rgb(0, 0, 0); border-right: 0px transparent !important; border-bottom: 1px solid rgb(187, 187, 187); text-align: center; line-height: 1.3em;\">시설명</th><th class=\"pe_pU NamoSE_border_show\" scope=\"col\" style=\"padding: 12px 0px; border-left: 1px solid rgb(201, 211, 223) !important; background-color: rgb(241, 248, 252); color: rgb(0, 0, 0); font-weight: 500; vertical-align: middle; border-top: 1px solid rgb(0, 0, 0); border-right: 0px transparent !important; border-bottom: 1px solid rgb(187, 187, 187); text-align: center; line-height: 1.3em;\">면적(㎡)</th><th class=\"pe_pU NamoSE_border_show\" scope=\"col\" style=\"padding: 12px 0px; border-left: 1px solid rgb(201, 211, 223) !important; background-color: rgb(241, 248, 252); color: rgb(0, 0, 0); font-weight: 500; vertical-align: middle; border-top: 1px solid rgb(0, 0, 0); border-right: 0px transparent !important; border-bottom: 1px solid rgb(187, 187, 187); text-align: center; line-height: 1.3em;\">객석</th><th class=\"pe_pU NamoSE_border_show\" scope=\"col\" style=\"padding: 12px 0px; border-left: 1px solid rgb(201, 211, 223) !important; background-color: rgb(241, 248, 252); color: rgb(0, 0, 0); font-weight: 500; vertical-align: middle; border-top: 1px solid rgb(0, 0, 0); border-right: 0px transparent !important; border-bottom: 1px solid rgb(187, 187, 187); text-align: center; line-height: 1.3em;\">용도 및 주요시설</th></tr></thead><tbody><tr><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">지상 4층</td><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">아이누리홀</td><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">300.49</td><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">200석</td><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">공연장(무대음향, 무대조명, 무대기계)</td></tr><tr><td align=\"center\" rowspan=\"2\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">지상 3층</td><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">아트홀</td><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">107.88</td><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">-</td><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">연습실(음향, 영상, 벽면거울)</td></tr><tr><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">세미나실</td><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">180.00</td><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">-</td><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">회의·강의실(음향, 영상, 책상(약 40인)</td></tr><tr><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">지상 1층</td><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">전시실</td><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">167.83</td><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">-</td><td align=\"center\" style=\"padding: 15px 10px; border-top: 1px solid rgb(201, 211, 223); border-left: 1px solid rgb(201, 211, 223); line-height: 1.5; border-right: 0px transparent !important; border-bottom: 1px solid rgb(201, 211, 223) !important; color: rgb(78, 78, 78); text-align: center; font-size: 14px;\">작품전시(조명, 가벽, 안내데스크)</td></tr></tbody></table>","num":25,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-2651-5300","fac_name":"갈산문화예술센터"},
+                {"y_coord":"126.972844434584","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=c31277cb4d044a558175082defd51330&thumb=Y","addr":"서울특별시 중구 정동길 43","x_coord":"37.5659336365406","open_day":"1995.06.17","seat_cnt":"344","yellow":null,"etc_desc":null,"airport":null,"entr_fee":"프로그램별 상이","subway":null,"busstop":null,"closeday":"행사별 상이","fax":"02-751-1997","green":null,"subjcode":"공연장","homepage":"https://jeongdong.or.kr/portal/main/main.do","fac_desc":"<div><span style=\"font-size: 14pt;\"><b>다양한 장르의 공연예술로 국민의 삶을 행복하게 하는 문화공간, 국립정동극장!</b></span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">국립정동극장은 한국최초의 근대식 극장 ‘원각사’의 복원이라는 역사적 의미와 근현대 예술정신을 계승하여 1995년 ‘정동극장’ 명칭으로 개관, 다양한 장르의 우수 공연과 새로운 시도들로 관객들과 만나 왔습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">또한 2000년 [전통예술무대] 연중 상설공연을 시작, 국내외 관객에 전통상설공연 [미소]를 선보이며 우리 전통문화의 전승과 대중성을 선도하고 그 우수성을 널리 알려 왔습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">한국 근현대 문화예술의 출발지 정동길에 위치한 정동극장은 다양한 장르 공연예술을 통해 국민의 문화향유 기회를 확대하고, 더 많은 공연예술인들과 관객이 만날 수 있는 공연예술의 현장이 되고, 공공극장으로서 본연의 역할과 책무를 확대하고자 ‘정동극장’에서 ‘국립정동극장’으로 명칭을 변경하였습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">특히 국립정동극장은 다양한 장르의 공연과 더불어 창작 초기 단계를 걸친 공연 중 발전 가능성이 큰 작품을 발굴하여 완성도 높은 공연으로 육성ㆍ지원ㆍ유통하는 역할을 수행하는 ‘2차 제작극장’의 역할도 수행하며 공연생태계 활성화에 기여하고 있습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">국립정동극장은 국민에게 정동길이 가지고 있는 역사와 문화의 정취를 선사하며, 다양한 장르의 우수한 공연예술로 국민의 삶을 행복하게 하는 문화공간이 되겠습니다.</span></div>","num":26,"red":null,"openhour":"상설공연 오후4시, 8시","entrfree":"유료","blue":null,"phne":"02-751-1500","fac_name":"국립정동극장"},
+                {"y_coord":"127.01420103656748","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000100734&thumb=Y","addr":"서울특별시 종로구 지봉로5길 7-5","x_coord":"37.57356472409345","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"법정공휴일","fax":null,"green":null,"subjcode":"기타","homepage":"https://www.ijongno.co.kr/fmcs/29","fac_desc":"<div><span style=\"font-size: 12pt;\">종로구민회관은 2000년 2월에 설립된 종로구시설관리공단에서 운영하는 종합스포츠/문화센타로서 지역발전 및 구민여러분의 생활의 편익과 건강, 복리증진을 위하여 전 직원이 봉사하는 마음으로 최선을 다하고 있습니다.</span></div><div><span style=\"font-size: 12pt;\">종로구민회관은 수영, 헬스 및 각종 스포츠와 다양한 문화공간을 운영하며 항상 구민들이 편안하고 안전한 여가활용공간을 유지하는 한편 저렴한 비용으로 수준 높고 다양한 프로그램을 즐기실 수 있도록 정성을 다하여 봉사하겠습니다. 또한 지역사회를 위한 각종 사회봉사활동에 적극 동참하여 지역사회의 균형적 발전에 이바지하고자 노력하고 있습니다.</span><br></div><div><span style=\"font-size: 12pt;\">저희 구민회관과 함께 해주신 구민여러분께 감사드리며 항상 눈과 귀를 크게 열고 네티즌 여러분들의 생생한 목소리가 고객에게 행복을 주는 일류공기업 만들기에 반영되도록 최선을 다 하겠습니다.</span><br></div><div><span style=\"font-size: 12pt;\">- 시설안내 : 수영장, 헬스장, 골프연습장, 창신아트홀, 소회의실, 문화교실, 스피닝룸, 체육관, 건강교실 등</span></div><div><br></div>","num":27,"red":null,"openhour":null,"entrfree":"유료","blue":null,"phne":"02-6048-1318","fac_name":"종로구민회관"},
+                {"y_coord":"126.907671330325","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=0ae7f92affe24968a769a58a540dbac1&thumb=Y","addr":"서울특별시 은평구 증산로5길 6","x_coord":"37.5828094398328","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"0","subway":null,"busstop":null,"closeday":"매주 금요일, 일요일을 제외한 법정공휴일","fax":"02-307-6020","green":null,"subjcode":"도서관","homepage":"http://www.jsplib.or.kr","fac_desc":"<div><span style=\"font-size: 14pt;\">은평구의 대표적 쉼터인 불광천을 지척에 둔 우리 도서관은 2008년 개관한 이래 한결같은 마음으로 지역 주민들의 정보 · 생활문화 공간으로서 역할을 수행하고, 꿈과 희망을 가지고 창의와 상상의 나래를 맘껏 펼치는 행복을 꿈꾸는 새로운 공간으로 발전하고자 노력하고 있습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">또한 시대적 요구에 발맞추어 각종 문화행사 및 독서프로그램을 운영함으로써 유아, 어린이, 청소년, 성인 등 다양한 계층이 필요로 하는 교육·문화·여가 활동의 장을 마련하고 있습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">앞으로도 언제나 주민들의 목소리에 귀를 기울이며 배움을 추구하는 모든 구민에게 앞서가는 평생교육의 장으로서 지역정보화를 선도하는 공공도서관으로서의 역할을 수행하는데 지속적인 연구와 최선을 다할 것입니다. 책을 통해 함께 어우러지는 열린 도서관을 만들기 위해 노력하겠습니다. 여러분의 더 많은 관심과 이용 부탁드립니다.</span></div>","num":28,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-307-6030","fac_name":"구립증산정보도서관"},
+                {"y_coord":"126.8350545759677","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000100799&thumb=Y","addr":"서울특별시 양천구 지양로 47","x_coord":"37.519931063925554","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"법정공휴일, 근로자의날","fax":"02-2606-4370","green":null,"subjcode":"기타","homepage":"https://www.ycs.or.kr/fmcs/21","fac_desc":"<p><span style=\"font-size: 14pt;\">신월문화체육센터는 주민 여러분의 건강한 여가생활과 삶의 활력을 위해 깨끗한 시설과 다양한 프로그램을 제공하는 신월문화체육센터입니다.</span><br></p><p><br></p><p><span style=\"font-size: 14pt;\">시설현황 : 수영장, 다목적실, 헬스장, 체육관, 기구필라테스실</span></p><p><span style=\"font-size: 14pt;\">이용안내 : 월 ~ 금요일 06:00~22:00/ 토요일 06:00~21:00</span></p><p><span style=\"font-size: 14pt;\">프로그램 : 수영, 헬스, 요가, 탁구, 배구, 줌바, 한국무용, 성인발레, 라인댄스 등</span></p><p><br></p>","num":29,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-2605-4093","fac_name":"신월문화체육센터"},
+                {"y_coord":"127.12088940368128","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=4cdc3af32d864221b0c5f90cfbcf332f&thumb=Y","addr":"서울특별시 송파구 위례성대로 71","x_coord":"37.51543881335773","open_day":"2012년 4월 30일","seat_cnt":null,"yellow":null,"etc_desc":"풍납토성 출토 시유도기옹 등 57,057점","airport":null,"entr_fee":"무료","subway":null,"busstop":null,"closeday":"매주 월요일, 1월 1일, 시장이 정하는 휴관일(관장에게 위임) 단, 월요일이 공휴일인 경우 휴관하지 않음","fax":null,"green":null,"subjcode":"박물관/기념관","homepage":"https://baekjemuseum.seoul.go.kr","fac_desc":"<p class=\"HStyle0\" style=\"margin-right: 8.1pt; line-height: 1.8;\"><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">한성백제박물관은 ‘2천년 역사도시 서울’의 고대 문화를 복원·조명하는 시립박물관이며, 2012년 4월 개관하였다. 서울을 5백년간 왕도로 삼았던 백제를 중심으로 구석기시대부터 통일신라시대까지 서울지역과 한강유역의 역사？문화를 다루고 있으며, 5개 부서가 전시, 유물수집, 교육·문화행사, 발굴조사, 학술회의 및 학술서 발간 등의 업무를 수행하고 있다.</span></p><p style=\"line-height: 1.8;\">\r\n\r\n</p><p class=\"HStyle0\" style=\"margin-right: 8.1pt; line-height: 1.8;\"><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">박물관 건물은 백제의 </span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">왕</span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">성이었던 풍납동토성 및 몽촌토성의 이미지를 반영하면서 주변 환경과 조화를 </span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">이루어</span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\"> 2012년 한국건축문화대상 우수상, 서울시 건축상 최우수상 등을 수상하였다.&nbsp;&nbsp; </span></p><p style=\"line-height: 1.8;\">\r\n\r\n</p><p class=\"HStyle0\" style=\"margin-right: 8.1pt; line-height: 1.8;\"><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">전시실은 상설전시실과 특별전시실로 나</span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">뉘는데,</span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\"> 상설전시는 로비 및 </span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">제1전시실(선사), 제2전시실(백제), 제3전시실(고구려？신라)로 구분하며</span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">, 특별전시는 1년에 4회 계절별로 개최한다.</span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\"> 로</span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">비에는 너비 43m, 높이 11m 크기의 풍납동토성 성벽 자름면을 전시하여 판축법(版築法), 부엽법(敷葉法) 등 성벽 축조 공법을 소개하고 있다. </span></p><p style=\"line-height: 1.8;\">\r\n\r\n</p><p class=\"HStyle0\" style=\"margin-right: 8.1pt; line-height: 1.8;\"><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">이밖에 별도로 운영하는 &lt;백제 3D 여행관&gt;에서는 “유린, 백제로 가다？칠지도를 완성하라-”, “담지의 모험- 해상왕국 백제-” 등 2편의 입체영상을 교대로 상영하여 어린이들의 호응을 얻고 있다. </span></p><p style=\"line-height: 1.8;\">\r\n\r\n</p><p class=\"HStyle0\" style=\"margin-right: 8.1pt; line-height: 1.8;\"><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">교육동에서는 어린이·청소년·가족 대상 체험교육을 운영하며, </span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">전</span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">통놀이, 영화 상영, 음악회 등 다양한 문화행사를 정기적으로 개최한다. 학술행사는 3백석 규모의 강당에서 연중 개최한다. 박물관 소속 고고학 발굴조사단이 있어서 백제의 왕성구역인 몽촌토성과 왕릉구역인 석촌동고분군을 </span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">연중</span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\"> 발굴조사</span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">하며 현장을 시민에게 공개</span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">하고 있다. </span><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">몽촌토성에 위치한 백제집자리전시관과 어린이전문교육기관인 몽촌역사관을 분관으로 운영하고 있다.</span><span style=\"font-size: 12pt;\">&nbsp;</span></p><p class=\"HStyle0\" style=\"margin-right: 8.1pt; line-height: 1.8;\"><span style=\"font-size: 12pt;\">&nbsp;</span></p><p style=\"line-height: 1.8;\">\r\n\r\n</p><p class=\"HStyle0\" style=\"margin-right: 8.1pt; line-height: 1.8;\"><span style=\"font-family: \" 신명=\"\" 신명조,한컴돋움\";=\"\" font-size:=\"\" 12pt;\"=\"\">한성백제박물관 누리집: http://baekjemuseum.seoul.go.kr</span></p>","num":30,"red":null,"openhour":"평일 : 오전 9시~오후 7시<br>토, 일, 공휴일 : 오전 9시~오후 7시(단,11~2월 : 오전 9시~오후 6시)","entrfree":"무료","blue":null,"phne":"02-2152-5800","fac_name":"한성백제박물관"},
+                {"y_coord":"127.001322132303","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=5872826ed6eb4aac992d4bd5c1a6e0b7&thumb=Y","addr":"서울특별시 종로구 대명길 3","x_coord":"37.583389560237","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"매주 월요일 및 공휴일 휴관","fax":"02-6008-7348","green":null,"subjcode":"기타","homepage":"https://www.sfac.or.kr/artspace/artspace/play_main.do","fac_desc":"<span style=\"font-size: 14pt;\">서울연극센터는 옛 혜화동사무소를 리모델링하여 2007년 개관한 대학로의 연극 전문 클러스터입니다. 연극 분야 창작 생태계 선순환을 위해 시민과 연극인이 교류하는 플랫폼으로, 공연 정보와 편의를 제공하는 라운지, 연극 장르 예술가의 워크숍, 교육, 연습이 가능한 다목적실, 소규모 세미나 및 회의를 할 수 있는 세미나실, 기획 과정의 문서 작업을 할 수 있는 공유랩, 소규모 공연이나 포럼이 진행되는 스튜디오가 조성됐습니다.</span>","num":37,"red":null,"openhour":"화~토요일 10:00~20:00 | 일,공유일 10:00~19:00","entrfree":"유료","blue":null,"phne":"02-743-9333","fac_name":"서울연극센터"},
+                {"y_coord":"127.075803211835","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000100216&thumb=Y","addr":"서울특별시 서초구 신흥안길 40-10","x_coord":"37.4531367590412","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"무료","subway":null,"busstop":null,"closeday":"1월1일, 설날, 추석 연휴기간","fax":null,"green":null,"subjcode":"박물관/기념관","homepage":"http://www.ktreedesign.com/","fac_desc":"<p style=\"box-sizing: border-box; padding-bottom: 20px; font-size: 14px; font-family: &quot;Gill Sans&quot;, Verdana, dotum, gulim; border: 0px; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-alternates: inherit; font-variant-position: inherit; font-weight: 700; font-stretch: inherit; line-height: 23px; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; vertical-align: baseline; color: rgb(102, 102, 102); background-color: rgb(255, 255, 255);\">분재박물관에는 수령 500년이 된 소사나무와 수렵수를 비롯해 금방이라도 바닷가의 내음을 풍길듯한 해송,<br style=\"box-sizing: border-box; font-size: 12px; font-family: &quot;nanum gothic&quot;, sans-serif;\">그리고 작은 키에 열매를 주렁주렁 매단 과실나무들까지 100수종의 5000여 분재가 전시되어 있습니다.</p><p style=\"box-sizing: border-box; padding-bottom: 20px; font-size: 14px; font-family: &quot;Gill Sans&quot;, Verdana, dotum, gulim; border: 0px; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-alternates: inherit; font-variant-position: inherit; font-weight: 700; font-stretch: inherit; line-height: 23px; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; vertical-align: baseline; color: rgb(102, 102, 102); background-color: rgb(255, 255, 255);\">이들 대부분은 김관장이 40여 년간 자식들처럼 아끼며 키워온 분재들로서 작품 하나하나가<br style=\"box-sizing: border-box; font-size: 12px; font-family: &quot;nanum gothic&quot;, sans-serif;\">오랜세월의 흔적과 함께 ‘자연스러운 분재가 가장 아름답다’는 김재인 관장의 뜻을 그대로<br style=\"box-sizing: border-box; font-size: 12px; font-family: &quot;nanum gothic&quot;, sans-serif;\">담아내고 있는 듯 합니다.</p><p style=\"box-sizing: border-box; padding-bottom: 20px; font-size: 14px; font-family: &quot;Gill Sans&quot;, Verdana, dotum, gulim; border: 0px; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-alternates: inherit; font-variant-position: inherit; font-weight: 700; font-stretch: inherit; line-height: 23px; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; vertical-align: baseline; color: rgb(102, 102, 102); background-color: rgb(255, 255, 255);\">작은 자연을 담아놓은 분재의 모습과 시간과 계절이 흐르며 변화하는 아름다움에 큰 매력을 느끼게 됩니다.<br style=\"box-sizing: border-box; font-size: 12px; font-family: &quot;nanum gothic&quot;, sans-serif;\">도심 속 작은 자연을 통하여 한적한 여유와 쉼, 그리고 한국적인 미와 가치를 경험하시길 바랍니다.</p><br>\r\n\r\n<br><br>","num":31,"red":null,"openhour":"※ 하절기 (3월~10월) : 09:00~19:00  일요일(12:00~19:00)※ 동절기 (11월~2월) : 09:00~17:00  일요일(12:00~17:00)","entrfree":"무료","blue":null,"phne":"02-577-0002","fac_name":"한국분재박물관"},
+                {"y_coord":"127.098141751177","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000100251&thumb=Y","addr":"서울특별시 송파구 올림픽로 240","x_coord":"37.5113096112036","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":"(자가용) \r\n- 경부고속도로 이용시 : 서울 - 구리,판교IC - 송파IC - 가락시장 - 잠실4거리 - 롯데월드\r\n- 중부고속도로 이용시 : \r\n① 동서울 - 강일(하일)IC - 88올림픽도로 - 잠실대교 성남방향 - 잠실4거리 - 롯데월드\r\n② 서울 - 구리,판교IC - 서하남IC - 올림픽공원-잠실4거리 - 롯데월드","airport":null,"entr_fee":"롯데월드(유료) 입장 시 무료 이용","subway":null,"busstop":null,"closeday":"연중무휴","fax":"02-411-4454","green":null,"subjcode":"공연장","homepage":"http://www.lotteworld.com","fac_desc":"<span style=\"font-size: 14pt;\">롯데월드는 모험과 신비를 주제로 한 실내 주제공원인 롯데월드 어드벤처, 호수공원인 매직아일랜드,쇼핑몰, 민속박물관, 아이스링크, 호텔, 백화점 등으로 구성되어 관광, 레저,쇼핑, 문화를 한곳에서 해결할 수 있는 대단위 복합생활공간이다. 롯데월드 가든스테이지는 롯데월드 공연의 중심무대로 각종 시즌 뮤지컬 쇼, 공개방송 등의 다양한 이벤트가 진행된다.</span>","num":32,"red":null,"openhour":null,"entrfree":"유료","blue":null,"phne":"1661-2000","fac_name":"롯데월드 가든스테이지"},
+                {"y_coord":"127.003256182632","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000100850&thumb=Y","addr":"서울특별시 종로구 동숭길 3","x_coord":"37.5805022887696","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"프로그램별 상이","subway":null,"busstop":null,"closeday":"일요일, 법정공휴일","fax":null,"green":null,"subjcode":"기타","homepage":"https://www.arko.or.kr/arthouse/","fac_desc":"<div style=\"text-align: center;\" align=\"center\"><span style=\"font-size: 12pt;\" 맑은=\"\" 고딕\";=\"\" font-size:=\"\" 17px;=\"\" letter-spacing:=\"\" -0.5px;\"=\"\">예술가의집은 우리나라 문화예술의 발원지라고 할 수 있는 대학로에 있으며, 예술가의 창작을 지원하고 예술가와 예술가, 예술가와 시민 간 소통을 지원하는 매개형 열린공간입니다.</span><br></div>","num":33,"red":null,"openhour":null,"entrfree":"유료","blue":null,"phne":"02-760-4715","fac_name":"예술가의집"},
+                {"y_coord":"126.985613628841","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=bffc7c7c0eb74673980df6969ff0f329&thumb=Y","addr":"서울특별시 종로구 인사동10길 11","x_coord":"37.5742827945118","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":"■ 주차공간없음(화랑 옆 유료주차장 이용)","airport":null,"entr_fee":"없음","subway":null,"busstop":null,"closeday":"토요일, 일요일, 공휴일(기획 및 초대전시중에는 무휴)","fax":null,"green":null,"subjcode":"미술관/갤러리","homepage":"http://www.garamgallery.co.kr/","fac_desc":"<span style=\"font-family: se-nanumgothic, arial, &quot;\\\\B098눔고딕&quot;, nanumgothic, sans-serif; font-size: 15px; white-space-collapse: break-spaces; background-color: rgb(255, 255, 255);\">가람화랑은 한국근현대미술 전문 화랑으로 1977년 인사동에 개관하였다. 이후 1991년 현재의 한옥으로 이전하여 형상미술을 위주로 하는 작가들을 중심으로 다양한 기획전과 초대전을 개최하고 있다.  뛰어난 안목을 바탕으로 한 전문 미술인이 경영하는 화랑으로, 근·현대의 수준 높은 작품들을 전시, 판매하고 있다. 근현대 미술에서도 주로 구상성이 강한 작품들을 전시하여 컬렉터들이 다양한 구상작품들을 한자리에서 감상할 수 있다. 또한 기업의 작품 컨설팅을 비롯하여 컬렉터들의 작품 컬렉션에 관한 자문을 제공하고 있다. 급속히 변화하는 시대에 대중과 소통하며 실험적이고 창의적인 작가 발굴에 힘쓰고 다양한 작품을 국내외 미술 애호가와 관람객들에게 소개하여 미술의 대중화에 힘쓰는 역할을 다해 나갈 것이다.</span><br>","num":34,"red":null,"openhour":"오전 10:00 ~ 오후 6:00","entrfree":"무료","blue":null,"phne":"02-732-6170","fac_name":"가람화랑"},
+                {"y_coord":"126.967627844336","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=3a1dc0d8855c49ec8e93c561e62cfeaf&thumb=Y","addr":"서울특별시 용산구 백범로 350","x_coord":"37.537241925875","open_day":"2005.10.10","seat_cnt":null,"yellow":null,"etc_desc":"본센터는 용산구 백범로 350에 위치한 지하2층, 지상5층 규모의 문화체육센터로 수영장, 헬스장 및 배드민턴 등 체육프로그램을 비롯하여 다양한 문화강좌 교육프로그램을 효율적으로 운영하여 구민의 건강과 복리증진에 기여하고 있습니다.","airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"1, 3, 5주 일요일, 공휴일, 국경일, 정기휴관일","fax":"02-707-2495","green":null,"subjcode":"기타","homepage":"https://www.yong-san.or.kr/site/cs/home","fac_desc":"<span style=\"font-size: 14pt;\">우리 용산구 문화체육센터는 일상생활에서 자율성과 참여를 바탕으로 지역주민의 권리를 옹호하며, 지역문화의 질을 향상시키기 위한 지도, 상담 등 여가활동을 위한 새로운 프로그램을 개발진행하여 건강한 신체활동과 레저문화의 장을 제공함으로써 용산구 전체의 복지증진과 구민건강을 위한 용산구 문화체육센터로서의 기능을 수행하고자 합니다.</span>","num":35,"red":null,"openhour":null,"entrfree":"유료","blue":null,"phne":"02-707-2492~4","fac_name":"용산구문화체육센터"},
+                {"y_coord":"127.012402476037","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000100776&thumb=Y","addr":"서울 강북구 솔샘로 177 솔샘문화정보센타","x_coord":"37.6204776505226","open_day":"2005.10.04","seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"0","subway":null,"busstop":null,"closeday":"첫째, 셋째 월요일, 정부지정 공휴일","fax":"02-944-3159","green":null,"subjcode":"도서관","homepage":"https://www.gblib.or.kr/solsem/","fac_desc":"<div><span style=\"font-size: 14pt;\">도심속의 쉼터, 솔샘문화정보도서관은 지역주민의 문화와 정보화수준향상을 위해 강북구에서 설립하고 강북구도시관리공단에서 운영하는 정보도서관으로서 2005년 개관하였습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">앞으로도 우리 솔샘문화정보센터는 지역주민여러분에게 보다 다양한 정보와 자료 그리고 최상의 서비스를 제공하고자 최선을 다하여 강북구만이 가지고 있는 지역적 문화적 특성을 살린 종합정보도서관으로서의 그 역할을 다하겠습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">시설안내</span></div><div><span style=\"font-size: 14pt;\">3층 : 컴퓨터교육장, 유아자료실, 어린이자료실</span></div><div><span style=\"font-size: 14pt;\">4층 : 종합자료실, 신문열람대, 일반열람실</span></div><div><span style=\"font-size: 14pt;\">5층 : 독서교실, 정보자료실, 휴게실</span></div>","num":36,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-944-3150","fac_name":"솔샘문화정보도서관"},
+                {"y_coord":"127.034960654281","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=564b90bf64764e5b8862d9d8a4ca7666&thumb=Y","addr":"서울 성동구 고산자로10길 9 성동문화정보센터","x_coord":"37.5591798757923","open_day":"1994.04.23","seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"매주 월요일, 공휴일, 장서 및 시설 점검 등 관장이 필요하다고 인정한 날","fax":"02-2299-6449","green":null,"subjcode":"도서관","homepage":"https://www.sdlib.or.kr/SD/main.do","fac_desc":"<div><span style=\"font-size: 14pt;\">성동구립도서관은 1999년 4월 23일 개관이래 독서환경 기반조성 및</span></div><div><span style=\"font-size: 14pt;\">생애주기별 맞춤형 독서서비스 확대 등 성동구의 독서문화 진흥을 위해 노력해 왔습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">2006년 금호도서관을 시작으로 용답도서관, 무지개도서관, 성수도서관, 청계도서관, 숲속도서관 등 6개의 분관을 개관하였으며, 책마루 2개소, 지하철역을 연계한 옥수 북토리지, 스마트도서관 3개소 운영을 통해 구민누구나 지역주민이 더욱 편리하게 이용할 수 있도록 통합 운영체계를 갖추었습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">지역 주민이 꿈꾸는 도서관을 만들기 위해 함께 읽고 쓰고 토론하고 나누는 사회적 독서로의 독서패러다임 핵심가치 변화, 일상에서 책 읽는 환경조성을 위한 정책방향과 연계한 실현 가능성 제고, 독서 나눔문화 활성화 등 지속적으로 도서관의 가치 및 지향 관점을 도출하여 반영하겠습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">앞으로 성동구립도서관은 더불어 살아가는 스마트 포용도시 성동구의 비전 실현과 미래교육특구로서 미래를 대비한 창의인재 육성 등의 정책 방향과 연계하여 지역사회와의 교류협력을 통한 도서관 문화 플랫폼으로의 역할을 확대하여 지역주민의 삶을 바꾸는 복합문화공간으로 운영 될 수 있도록 최선을 다하겠습니다.</span></div>","num":38,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-2204-6420","fac_name":"성동구립도서관"},
+                {"y_coord":"126.945533810385","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=5e017247027b4a369d1c0e0e01aef2dd&thumb=Y","addr":"서울 마포구 대흥로20길 28 마포아트센터","x_coord":"37.5499060881738","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"공휴일 09:00~17:00/매월 마지막주 일요일 휴무","fax":null,"green":null,"subjcode":"문화예술회관","homepage":"https://www.mfac.or.kr/","fac_desc":"<div><span style=\"font-size: 14pt;\"><b>-아트홀 맥</b></span></div><div><span style=\"font-size: 14pt;\">아트홀 맥은 가변형 음향판과 10개의 배턴, 첨단 음향과 조명시스템을 갖추어 어떠한 장르의 공연도 소화가 가능합니다.</span></div><div><span style=\"font-size: 14pt;\">2008년 리모델링 공사를 통해 내부 시설보완 및 인테리어 공사를 거쳐 재 탄생한 공연장입니다. 바닥과 객석 의자를 전면 교체하여 쾌적한 공간으로 탈바꿈 하여 최적의 관람 환경을 갖추고 있습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">아트홀 맥은 마포아트센터에서 운영하고 있는 781석 규모의 종합공연장으로 마포구 대흥동에 위치하고 있습니다. 지하철 6호선 대흥역 2번 출구에서 5분 거리, 2호선 이대역 5번 출구에서 10분 거리에 있으며 홍대, 신촌, 서강대등 대학가에 둘러싸인 문화예술의 새로운 공간으로 부상하고 있습니다.</span></div><div><span style=\"font-size: 14pt;\">아트홀 맥 건물은 서울특별시 건축물대전에서 건축상 은상을 수상한 훌륭하고 멋진 건축물의 공연장으로 현대식 최첨단 시스템을 갖추고 다양한 장르의 공연을 소화할 수 있는 전문 공연장으로서 대중적이고 예술성이 뛰어난 공연은 물론 독창적인 공연 등을 기획 및 유치하여 국내외의 실력 있는 예술인, 뮤지션들이 기량을 발휘 할 수 있는 공간으로의 역할을 수행하고 있습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">아트홀 맥은 수려한 외관은 물론 공연장 내부도 우아함과 편안함을 함께 느낄 수 있는 쾌적한 분위기에서 공연을 감상할 수 있도록 하였습니다. 또한 관객을 위한 다양한 서비스시설(안내데스크, 넓은 휴게 공간, 여유 있는 주차장 등)을 제공하고 있습니다.</span></div><div><span style=\"font-size: 14pt;\">아트홀맥은 건물 내 외관의 고급스러움과 더불어 모든 시민들이 찾을 수 있는 대중적이고 편한 공연장으로 서울 서부지 역의 문화 예술 공연의 새로운 지역으로서의 역할을 다하겠습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\"><b>-플레이 맥</b></span></div><div><span style=\"font-size: 14pt;\">플레이 맥은 인형극, 독주회 등 소규모 공연에 적합한 공간입니다. 연극, 놀다, 연주하다 의 뜻을 지닌 ‘play'라는</span></div><div><span style=\"font-size: 14pt;\">이름처럼 교육적이고 수준 높은 어린이 공연을 펼치고 있습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\"><b>-갤러리 맥</b></span></div><div><span style=\"font-size: 14pt;\">갤러리 맥은 전시의 목적에 맞게 다양한 공간 활용이 가능합니다.</span></div><div><span style=\"font-size: 14pt;\">체험을 기반으로 하는 엑스퍼테인먼트(Expertainment) 전시를 특화하여 작품 감상 뿐 아니라 체험이 결합된 프로그램을 즐길 수 있는 공간입니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\"><b>-아카데미 맥</b></span></div><div><span style=\"font-size: 14pt;\">아카데미 맥은 다양한 연령대가 들을 수 있는 다양한 프로그램으로 구성되어 있습니다.</span></div><div><span style=\"font-size: 14pt;\">유수의 전문 강사진이 유익한 강좌를 펼치고 있습니다.</span></div><div><span style=\"font-size: 14pt;\">엄마와 자녀가 함께하는 프로그램부터 유아, 청소년을 위한 강좌와 직장인 강좌 등 200여개</span></div><div><span style=\"font-size: 14pt;\">프로그램이 운영되고 있습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\"><b>-스포츠센터 맥</b></span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">대표전화 02-3274-8500</span></div><div><span style=\"font-size: 14pt;\">공연문의 : 02-3274-8600</span></div><div><span style=\"font-size: 14pt;\">- 09:00-18:00 (토,일 공휴일 휴무)</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">공연장 대관문의 : 02-3274-8618</span></div><div><span style=\"font-size: 14pt;\">스포츠센터 문의 : 02-3274-8500</span></div><div><span style=\"font-size: 14pt;\">09:00-18:00 (매월 마지막주 일요일,공휴일 휴무)</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">체육관 문의</span></div><div><span style=\"font-size: 14pt;\">- 02-3274-8501,8503</span></div>","num":39,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-3274-8600","fac_name":"마포아트센터"},
+                {"y_coord":"127.021555480923","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000100775&thumb=Y","addr":"서울 강북구 삼양로54길 68 강북청소년문화정보센터","x_coord":"37.6230813586229","open_day":"2013. 6. 21 : 명칭 변경 개관","seat_cnt":null,"yellow":null,"etc_desc":"그동안 문화적 참여공간이 미흡했던 미아동 지역에 청소년은 물론 지역주민들의 학습과 정보의 요람 및 문화생활의 공간이 될『강북청소년문화정보도서관』이 오랜시간 노력과 준비 끝에 개관을 하게 되었습니다.\r\n\r\n 2001년 12월에 개관한 우리 『강북청소년문화정보도서관』은 강북구의 지역정보화 및 다양한 문화생활에 기여할 수 있도록 첨단 시설과 장비를 갖추고 여러분을 맞이하고 있습니다.\r\n\r\n비록 그 규모에 있어 약간의 차이는 있겠으나 신개념 도서관에 어울리는 다양한 도서자료는 물론 고속인터넷이 가능한 전자정보실 등에서 지식정보화 시대에 필요한 유용한 자료와 정보를 제공하고 있습니다.\r\n\r\n강북청소년문화정보도서관은 첨단사회로 걸어가는 즈음에서 여러 지역주민들 모두가 평생 학습과 문화생활 참여의 공간으로 가깝게 다가갈 수 있도록 지속적으로 발전시켜 나갈 것입니다.\r\n\r\n아울러 향기로운 독서문화와 새로운 배움의 열정을 가진 청소년 및 구민 여러분을 『강북청소년문화정보도서관』에서 더욱 많이 뵙기를 간절히 바라며 계속해서 애정 어린 관심과 끊임없이 많은 이용있으시기 바랍니다.","airport":null,"entr_fee":"무료","subway":null,"busstop":null,"closeday":"매월 둘째, 넷째 월요일, 정부지정 공휴일","fax":"944-3149","green":null,"subjcode":"도서관","homepage":"https://www.gblib.or.kr/youth/index.do","fac_desc":"<div><span style=\"font-size: 14pt;\">안녕하십니까 강북문화정보도서관 관장입니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">그동안 문화적 참여공간이 미흡했던 미아동 지역에 청소년은 물론 지역주민들의 학습과 정보의 요람 및 문화생활의 공간이 될『강북청소년문화정보도서관』이 오랜시간 노력과 준비 끝에 개관을 하게 되었습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">2001년 12월에 개관한 우리 『강북청소년문화정보도서관』은 강북구의 지역정보화 및 다양한 문화생활에 기여할 수 있도록 첨단 시설과 장비를 갖추고 여러분을 맞이하고 있습니다.</span></div><div><span style=\"font-size: 14pt;\">비록 그 규모에 있어 약간의 차이는 있겠으나 신개념 도서관에 어울리는 다양한 도서자료는 물론 고속인터넷이 가능한 전자정보실 등에서 지식정보화 시대에 필요한 유용한 자료와 정보를 제공하고 있습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">강북청소년문화정보도서관은 첨단사회로 걸어가는 즈음에서 여러 지역주민들 모두가 평생 학습과 문화생활 참여의 공간으로 가깝게 다가갈 수 있도록 지속적으로 발전시켜 나갈 것입니다.</span></div><div><span style=\"font-size: 14pt;\">아울러 향기로운 독서문화와 새로운 배움의 열정을 가진 청소년 및 구민 여러분을 『강북청소년문화정보도서관』에서 더욱 많이 뵙기를 간절히 바라며 계속해서 애정 어린 관심과 끊임없이 많은 이용있으시기 바랍니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">감사합니다.</span></div>","num":40,"red":null,"openhour":"평일 09:00~20:00, 주말 09:00~17:00","entrfree":"무료","blue":null,"phne":"02-944-3140","fac_name":"강북청소년문화정보도서관"},
+                {"y_coord":"126.980087994867","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=5c8fe38cb24f4b17b45f4b520ed6a139&thumb=Y","addr":"서울특별시 종로구 삼청로 30","x_coord":"37.5786280284849","open_day":"2013년 11월 13일","seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"통합입장권 7,000원","subway":null,"busstop":null,"closeday":"1월 1일, 설날, 추석","fax":"02-3701-9529","green":null,"subjcode":"미술관/갤러리","homepage":"https://www.mmca.go.kr/visitingInfo/seoulInfo.do","fac_desc":"<div><span style=\"font-size: 14pt;\">국립현대미술관 서울관은 민현준 건축가에 의해 설계되어 '문화의 거리' 삼청로에 2013년 11월 개관하였습니다. 서울관 부지는 조선시대 소격서, 종친부, 규장각, 사간원이 있던 자리로서 한국 전쟁 후에는 국군수도통합병원, 기무사 등이 위치했던 역사적 유래를 가진 정치, 문화의 중심지입니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">국립현대미술관 서울관은 전시동 및 교육동을 비롯하여 디지털정보실, 멀티프로젝트홀, 영화관 등 다양한 시설을 갖춘 복합문화예술센터입니다. 현대미술의 흐름을 한 눈에 볼 수 있는 다채로운 전시와 영화, 공연, 교육 등을 통해 다양한 장르의 문화예술을 만나보실 수 있습니다. 또한 마당으로 둘러싸인 서울관은 옛 기무사 건물과 종친부가 조화를 이루고, 멀리 겸재 정선의 인왕제색도 안에 담긴 인왕산의 모습도 감상하실 수 있습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">어렵게만 느껴졌던 동시대 현대미술을 누구나 즐길 수 있는 곳, 국립현대미술관 서울관에서 문화예술 향유의 즐거움을 느껴보시기 바랍니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">□<b> 문화시설</b></span></div><div><span style=\"font-size: 14pt;\">- 디지털 정보실</span></div><div><span style=\"font-size: 14pt;\">서울관 디지털정보실은 디지털도서관과 디지털아카이브로 구성되어 있습니다. 디지털도서관에는 미술 관 출판물, 현대미술 관련 단행본 및 전시도록, 연속간행물, 전자책, 웹DB 등이 소장되어 있으며, 디지털아카이브에는 국립현대미술관의 발자취를 더듬어보는 상설전시 및 특별전시가 마련되어 있습니다.</span></div><div><span style=\"font-size: 14pt;\">- 멀티프로젝트홀</span></div><div><span style=\"font-size: 14pt;\">다원예술, 전시, 퍼포먼스, 교육 등 다채로운 문화예술 행사가 펼쳐지는 공간입니다. 여러 장르가 융복합 되는 현대미술의 다양한 예술적 표현이 가능하도록 하였습니다.</span></div><div><span style=\"font-size: 14pt;\">- 영화관</span></div><div><span style=\"font-size: 14pt;\">총 120여석 규모의 국립현대미술관 서울관 영화관에서는 예술영화, 실험영화, 국제영화제 등 다양한 프로그램이 진행되고 있습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">□ <b>편의시설</b></span></div><div><span style=\"font-size: 14pt;\">- 아트존</span></div><div><span style=\"font-size: 14pt;\">서울관 1층 아트존에서는 조각, 사진, 드로잉, 판화, 공예(도예, 장신구, 섬유, 금속 등)와 디자인 상품 및 디자인 가구 등 총 500여종 이상의 오리지널 작품이 전시, 판매되고 있습니다. 그 외에도 다양한 아트상품과 문화 기념품을 만나보실 수 있습니다.</span></div><div><span style=\"font-size: 14pt;\">- 카페테리아</span></div><div><span style=\"font-size: 14pt;\">전시장 내부에 위치한 휴게공간으로, 미술관 이미지에 부합하는 특화된 샐러드, 파스타, 파니니 등의 메뉴를 제공합니다.</span></div><div><span style=\"font-size: 14pt;\">- 푸드코트</span></div><div><span style=\"font-size: 14pt;\">합리적인 가격에 누구나 즐길 수 있는 비빔밥, 불고기, 육개장 등 다양한 메뉴의 식음료가 준비되어 있습니다.</span></div><div><span style=\"font-size: 14pt;\">- 북카페 오설록</span></div><div><span style=\"font-size: 14pt;\">서울관 외부 마당과 아름다운 삼청동 길이 훤히 보이는 탁 트인 전망을 자랑하는 복합 차 문화 공간입니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">□<b> 위치안내</b></span></div><div><span style=\"font-size: 14pt;\">지하철 3호선 : 안국역 1번 출구 광화문 방향</span></div><div><span style=\"font-size: 14pt;\">지하철 5호선 : 광화문역 2번 출구 삼청로 방향</span></div>","num":41,"red":null,"openhour":"화, 목, 금, 일 10:00 ~ 18:00, 수, 토 10:00 ~ 21:00(야간개장 오후 6~9시 무료관람)","entrfree":"유료","blue":null,"phne":"02-3701-9500","fac_name":"국립현대미술관 서울"},
+                {"y_coord":"126.980378016466","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=7e74ff794568405eaad8bc8caef134f1&thumb=Y","addr":"서울특별시 종로구 율곡로 5","x_coord":"37.5761097079432","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"토,일요일, 공휴일","fax":" 02) 2148-5998","green":null,"subjcode":"문화원","homepage":"http://jongno.kccf.or.kr","fac_desc":"<div><span style=\"font-size: 14pt;\"><b>[문화원 현황]</b></span></div><div><span style=\"font-size: 14pt;\">종로문화원은 지역사회의 정신문화계도 및 문화진흥을 목적으로 하는 특수법인단체로 지역문화를 발전시키기 위해 운영되고 있습니다. 또한 3·1 만세의 날 거리축제, 종로전국청소년국악경연대회, 어르신문화프로그램, 월간 종로문화 발간, 향토사료집 발간, 종로문화대학, 제1,2차 지방문화탐방, 종로이야기강좌 등의 다양한 문화행사를 진행하고 있습니다.</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\"><b>[설립목적]</b></span></div><div><span style=\"font-size: 14pt;\">지역고유문화의 계발·보급·보존·전승 및 선양</span></div><div><span style=\"font-size: 14pt;\">향토사의 발굴·조사·연구 및 사료의 수집, 보존</span></div><div><span style=\"font-size: 14pt;\">지역문화 행사의 개최</span></div><div><span style=\"font-size: 14pt;\">문화에 관한 자료의 수집·보존 및 보급</span></div><div><span style=\"font-size: 14pt;\">지역 전통문화의 국내·외 교류</span></div><div><span style=\"font-size: 14pt;\">지역 문화에 대한 사회교육활동</span></div><div><span style=\"font-size: 14pt;\">지역 환경보존 등 지역사회 발전을 위한 문화활동</span></div><div><span style=\"font-size: 14pt;\">지역 문화의 창달을 위한 사업</span></div><div><span style=\"font-size: 14pt;\">기타 지역문화 발전에 기여할 수 있는 사업</span><br></div><div><span style=\"font-size: 14pt;\"><br></span></div><div><span style=\"font-size: 18.6667px;\">사진출처: 한국관광공사</span><span style=\"font-size: 14pt;\"><br></span></div>","num":42,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-2148-4087-8","fac_name":"종로문화원"},
+                {"y_coord":"126.968231878405","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=5de16fbb89cd482980d02aae57631de7&thumb=Y","addr":"서울특별시 종로구 사직로9길 7","x_coord":"37.5762858214854","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"0","subway":null,"busstop":null,"closeday":"매월 첫째, 셋째 월요일, 일요일을 제외한 법정 공휴일(일요일과 공휴일이 겹칠 경우 휴관)","fax":null,"green":null,"subjcode":"도서관","homepage":"http://childlib.sen.go.kr/","fac_desc":"<span style=\"font-size: 14pt;\">어린이 도서관은 1979년 5월 4일 세계 어린이의 해를 기념하여 설립된 우리나라에서 유일한 어린이 전용 공립도서관으로, 인왕산 자락의 사직공원 안에 있습니다. 국내에서 발행되는 어린이와 관련된 각종 사전, 컴퓨터, 각 교과목, 과학, 예술, 명작, 창작동화, 역사, 지리에 관련된 도서 등 유치원 및 초등학생을 위해 많은 자료가 비치되어 있습니다. 자유롭게 선택하여 이용할 수 있고 가정으로 대출하실 수 있습니다.</span>","num":43,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-731-2300","fac_name":"서울특별시교육청 어린이도서관"},
+                {"y_coord":"127.06609416533551","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000100751&thumb=Y","addr":"서울특별시 광진구 뚝섬로26길 58","x_coord":"37.534067607714206","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"매월 1,3주 화요일","fax":"02-465-0739","green":null,"subjcode":"도서관","homepage":"https://www.gwangjinlib.seoul.kr/jy4dong/index.do","fac_desc":"<p>\r\n<span style=\"font-size: 14pt;\">■ 위 치 :\t서울시 광진구 자양4동 63-1번지 복합청사內 지상 1층&nbsp;</span></p><p><span style=\"font-size: 18.6667px;\">■&nbsp;</span><span style=\"font-size: 14pt;\">규 모 :\t대지 333.20㎡, 건물 333.20㎡(100.79평)&nbsp;</span></p><p><span style=\"font-size: 18.6667px;\">■&nbsp;</span><span style=\"font-size: 14pt;\">총열람석 : 74석&nbsp;</span></p><p><span style=\"font-size: 18.6667px;\">■&nbsp;</span><span style=\"font-size: 14pt;\">이용시간</span><br></p><p><span style=\"font-size: 18.6667px;\">- 하절기(3-10월)&nbsp;</span><span style=\"font-size: 18.6667px;\">09:00 ~ 20:00</span></p><p><span style=\"font-size: 18.6667px;\">- 동절기(11-2월)&nbsp;</span><span style=\"font-size: 18.6667px;\">09:00 ~ 19:00</span></p><p><span style=\"font-size: 18.6667px;\">- 토요일 / 일요일&nbsp;</span><span style=\"font-size: 18.6667px;\">09:00 ~ 18:00</span></p><br><p></p>","num":44,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-465-0737~8","fac_name":"자양4동도서관"},
+                {"y_coord":"126.829388763217","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=697a80a322e24ae88ee07962800cdcf6&thumb=Y","addr":"서울특별시 강서구 마곡중앙로 136 LG아트센터 서울","x_coord":"37.5653629860767","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":"주차는 GS타워 지하주차장을 이용하시면됩니다","airport":null,"entr_fee":"프로그램별 상이","subway":null,"busstop":null,"closeday":"월요일","fax":null,"green":null,"subjcode":"공연장","homepage":"https://www.lgart.com/home/ko/main","fac_desc":"<b><span style=\"font-size: 12pt;\">■ CHAMBER WALL</span><br>\r\n\r\n<br><span style=\"font-size: 12pt;\">\r\n\r\n이동형 콘서트 타워 및 천장음향 반사판</span><br>\r\n\r\n</b><span style=\"font-size: 12pt;\">공연의 규모와 특성에 맞게 무대공간 크기, 음향조건, 그리고 미관까지 </span><br><span style=\"font-size: 12pt;\">\r\n\r\n조절할 수 있는 음악공연을 위한 특수전문설비입니다. </span><br>\r\n\r\n<br>\r\n\r\n<b><span style=\"font-size: 12pt;\">가변형 음향설비</span></b><br><span style=\"font-size: 12pt;\">\r\n\r\n객석 공간의 외벽과 내벽 사이 약 1M 정도 떨어진 틈 사이로 특수제작된 </span><br><span style=\"font-size: 12pt;\">\r\n\r\n가변형 음향흡음설비를 설치하여 공연별로 필요한 최적의 음향효과를 </span><br><span style=\"font-size: 12pt;\">\r\n\r\n연출합니다. </span><br>\r\n\r\n<br>\r\n\r\n<b><span style=\"font-size: 12pt;\">■ AUDITORIUM &amp; STAGE</span></b><br>\r\n\r\n<br>\r\n\r\n<b><span style=\"font-size: 12pt;\">1,103석 규모의 객석과 프로시니엄 무대로 구성</span><br>\r\n\r\n</b><span style=\"font-size: 12pt;\">무대바닥의 넓이는 폭 25M 깊이 12.5M이며, 바닥재는 고무패드 위에 상을 올리고 그 위에 12mm의 합판 2겹으로 바탕을 구성하고 그 위에 </span><br><span style=\"font-size: 12pt;\">\r\n\r\n단풍나무널을 깔아 무대바닥을 마감하였습니다. 무대 바닥의 뒤틀림을 </span><br><span style=\"font-size: 12pt;\">\r\n\r\n방지하기 위해 600mm 간격으로 팽창 조인트를 두어 신축에 대비하였고,</span><br><span style=\"font-size: 12pt;\">\r\n\r\n최종적으로 내구성이 강한 도료로 도장하였습니다.</span><br>\r\n\r\n<br><span style=\"font-size: 12pt;\">\r\n\r\n무대바닥은 그 자체가 탄력성을 지니고 있어 주로 무용수들이 선호하는 </span><br><span style=\"font-size: 12pt;\">\r\n\r\n구조이며, 무거운 장치들의 이동 시에도 완충작용을 하여 무대 면의 </span><br><span style=\"font-size: 12pt;\">\r\n\r\n손상이나 무대 면과 충돌할 때 충격을 완화시키는 효과를 갖습니다.</span><br>\r\n\r\n<br>\r\n\r\n<b><span style=\"font-size: 12pt;\">■ CONTROL ROOM</span><br>\r\n\r\n</b><br>\r\n\r\n<b><span style=\"font-size: 12pt;\">음향조종실</span><br>\r\n\r\n</b><span style=\"font-size: 12pt;\">공연장 내에 모든 전기음향과 관련된 장치의 제어를 위한 공간으로 객석 </span><br><span style=\"font-size: 12pt;\">\r\n\r\n1층의 후미에 위치하고 있습니다. 무대를 향한 방음창은 필요에 의해 개폐가</span><br><span style=\"font-size: 12pt;\">\r\n\r\n가능한 전동창호(Mortorized Window)로 되어 있으며, 음향조종용 콘솔을</span><br><span style=\"font-size: 12pt;\">\r\n\r\n이용하기 위한 장비반입구로도 활용되고 있습니다. </span><br>\r\n\r\n<br>\r\n\r\n<b><span style=\"font-size: 12pt;\">조명조종실</span></b><br><span style=\"font-size: 12pt;\">\r\n\r\n조명장치를 제어하기 위한 공간으로 무대가 잘 보이는 객석 1층의 후면의</span><br><span style=\"font-size: 12pt;\">\r\n\r\n음향조종실과 나란히 위치하고 잇으며 개폐식 도어를 통하여 공연 시 </span><br><span style=\"font-size: 12pt;\">\r\n\r\n음향조종실과 동일 공간으로 운영될 수 있습니다.</span><br>\r\n\r\n<br>\r\n\r\n<b><span style=\"font-size: 12pt;\">■ LOBBY</span><br>\r\n\r\n<br><span style=\"font-size: 12pt;\">\r\n\r\n메인 로비</span><br>\r\n\r\n</b><span style=\"font-size: 12pt;\">아트센터 메인 로비는 객석부 바닥의 물리적인 경사로 인해 하부층에</span><br><span style=\"font-size: 12pt;\">\r\n\r\n나타나는 구조체의 경사를 이용하여 거대한 파형천장을 계획하였고, 이러한</span><br><span style=\"font-size: 12pt;\">\r\n\r\n디자인 요소는 역동적인 힘과 시각적인 왜곡현상을 부각시키고자 한</span><br><span style=\"font-size: 12pt;\">\r\n\r\n것입니다. 매표/보관/만남의 장소로 이용되며 간단한 식음료 서비스가</span><br><span style=\"font-size: 12pt;\">\r\n\r\n제공됩니다.</span><br>\r\n\r\n<br>\r\n\r\n<b><span style=\"font-size: 12pt;\">객석 로비</span><br>\r\n\r\n</b><span style=\"font-size: 12pt;\">객석 로비 바닥과 벽면의 마감에 사용된 브라운 계열의 색상은 온화하고</span><br><span style=\"font-size: 12pt;\">\r\n\r\n포근한 느낌을 연출하기 위해 배려된 주 색채이며, 부분적으로 출입구에는</span><br><span style=\"font-size: 12pt;\">\r\n\r\n관객의 인지도를 높이기 위해 로열블루컬러를 사용하였습니다. 특징적으로 </span><br><span style=\"font-size: 12pt;\">\r\n\r\n천정은 골드계통의 색상을 사용함으로써 전체적으로 통일감과 균형감을 </span><br><span style=\"font-size: 12pt;\">\r\n\r\n주었습니다. </span><br>\r\n\r\n<br>\r\n\r\n<b><span style=\"font-size: 12pt;\">■ REHEARSAL ROOM</span><br>\r\n\r\n<br>\r\n\r\n</b><span style=\"font-size: 12pt;\">오피스 타워의 지하 2층에 위치한 리허설 룸은 11Mx18M의 연습용 공간과</span><br><span style=\"font-size: 12pt;\">\r\n\r\n남녀탈의실 및 샤워실을 갖추고 있습니다. </span><br><span style=\"font-size: 12pt;\">\r\n\r\n연습실 바닥은 연기자의 관절을 보호하기 위해 탄력성 있는 구조의 </span><br><span style=\"font-size: 12pt;\">\r\n\r\n단풍나무로 마감되어 있으며, 벽면에는 양측에 전면 거울 및 커튼을</span><br><span style=\"font-size: 12pt;\">\r\n\r\n설치하여 연기자가 스스로 바라보며 연습할 수 있도록 배려하였습니다.</span><br><span style=\"font-size: 12pt;\">\r\n\r\n&nbsp;</span><br>\r\n\r\n<br>\r\n\r\n<b><span style=\"font-size: 12pt;\">■ 건축구조분리공법</span><br>\r\n\r\n</b><br><span style=\"font-size: 12pt;\">\r\n\r\n공연장 건물의 하부 및 측벽에는 건축구조분리체가 설치되어 있어, 주변의</span><br><span style=\"font-size: 12pt;\">\r\n\r\n어떤 소음도 공연장 내부로 유입되는 것을 방지합니다. 이는 국내</span><br><span style=\"font-size: 12pt;\">\r\n\r\n공연장에서는 처음으로 도입된 공법으로 아티스트와 관객 모두에게 무소음 </span><br><span style=\"font-size: 12pt;\">\r\n\r\n공연 환경을 제공합니다.</span>","num":45,"red":null,"openhour":"평일 : 오전9시 ~ 오후6시","entrfree":"유료","blue":null,"phne":"1661-0017","fac_name":"LG아트센터 서울"},
+                {"y_coord":"127.110615495296","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=4152235870ae48c69da7332dd1377f5f&thumb=Y","addr":"서울특별시 광진구 아차산로78길 90","x_coord":"37.5510729137918","open_day":"2000.11.10","seat_cnt":"도서관 자료열람실  220석 / 문화동 일반열람실 348석 / 문화동 영화음악감상실 160석","yellow":null,"etc_desc":"■ 관람시간\r\n\r\n평일 - 종합자료실 : 09:00-22:00\r\n       어린이열람실 : 09:00-18:00\r\n       일반열람실 : 07:00-23:00\r\n주말 - 종합자료실/어린이열람실 : 09:00-17:00\r\n       일반열람실 : 07:00-22:00","airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"둘째, 넷째주 화요일, 국가지정공휴일","fax":"02-3437-0165","green":null,"subjcode":"도서관","homepage":"https://www.gwangjinlib.seoul.kr/gjinfo/index.do","fac_desc":"<div style=\"text-align: left;\" align=\"left\"><span style=\"font-size: 14pt;\">저희 광진정보도서관은 광진구 광장동에 위치한 \"한강이 보이는 도서관\"으로 유명하며 다양한 문화 프로그램을 기획하여 주민과 소통하고 주민과 지역사회를 연결시켜주는 광진구의 대표 도서관입니다.&nbsp;</span><span style=\"font-size: 14pt;\">도서관 건물은 도서관동과 문화동으로 나누어져 있으며 구름다리로 서로 연결되어 있습니다.&nbsp;</span><span style=\"font-size: 14pt;\">도서관동은 종합안내, 어린이열람실, 멀티미디어,연속간행물실, 종합자료실, 도서관운영팀사무실로 운영되며 문화동은 영화음악감상실, 이야기방, 일반열람실과 휴게시설로 운영되고 있습니다.</span></div>","num":46,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-3437-5092","fac_name":"광진정보도서관"},
+                {"y_coord":"126.929648387272","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=acc1e3e2f8e34b8e8b19373e798c5c1e&thumb=Y","addr":"서울특별시 마포구 와우산로 148","x_coord":"37.5541249044242","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":"프로그램별 상이","subway":null,"busstop":null,"closeday":"홈페이지 참조","fax":null,"green":null,"subjcode":"공연장","homepage":"https://changmuartcenter.com/","fac_desc":"<span style=\"font-size: 12pt;\">전 세대를 아우르는 기획공연으로 뛰어난 작품과 안무자를 발굴하여 다양한 실험의 기회를 제공하고, 국내 최고의 무용 관계자들이 모여 무용과 관련된 교육, 기획, 공연, 출판, 연구를 중점으로 무용 관련 사업을 진행할 뿐 아니라, 국내는 물론 국제 무대에서 눈부신 활동을 벌이고 있는 복합 무용 기관으로 세계 무대로의 가교 역할을 하기 위해 설립된 (사) 창무예술원의 무용전문 소극장인 포스트극장(The post Theater)입니다.</span>","num":47,"red":null,"openhour":null,"entrfree":"유료","blue":null,"phne":"02-337-5961","fac_name":"포스트극장"},
+                {"y_coord":"126.979465861688","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=0456ff55c6324143aba768e734c366de&thumb=Y","addr":"서울특별시 관악구 남부순환로 2076","x_coord":"37.4760535374985","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":"-","airport":null,"entr_fee":"무료","subway":null,"busstop":null,"closeday":"1월 1일 , 매주 월요일(월요일이 공휴일인 경우 정상 개관)","fax":null,"green":null,"subjcode":"미술관/갤러리","homepage":"https://sema.seoul.go.kr/kr/visit/namseoul","fac_desc":"<div style=\"text-align: left;\" align=\"left\"><span style=\"font-size: 14pt;\">남서울미술관은 역사의 정취가 가득한, 오래 머물고 싶은 미술관입니다.</span></div><div style=\"text-align: left;\" align=\"left\"><span style=\"font-size: 12px;\"><br></span></div><div style=\"text-align: left;\" align=\"left\"><span style=\"font-size: 14pt;\">미술관이 둥지를 튼 이곳은 대한제국(1897~1910) 시절 벨기에 영사관으로 사용된 건물(사적 제254호)로, 1905년 회현동에 준공되어 1983년 지금의 남현동으로 옮겨졌습니다.</span></div><div style=\"text-align: left;\" align=\"left\"><span style=\"font-size: 14pt;\">길게 뻗은 복도를 중심으로 양옆으로 자유롭게 배열된 두 개 층의 방들에서는 다양한 층위의 관람객에 특화된 공공 프로그램을 소개합니다.</span></div>","num":48,"red":null,"openhour":"평일(화~금) 오전 10시 ~ 오후 8시 (관람 종료 1시간 전까지 입장)<br>토 · 일 · 공휴일 오전 10시~오후 6시","entrfree":"무료","blue":null,"phne":"02-598-6246","fac_name":"서울시립 남서울미술관"},
+                {"y_coord":"126.964661018954","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000100901&thumb=Y","addr":"서울특별시 종로구 인왕산로1길 21","x_coord":"37.5742098160357","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":null,"airport":null,"entr_fee":null,"subway":null,"busstop":null,"closeday":"공휴일*별도확인 필요","fax":null,"green":null,"subjcode":"문화예술회관","homepage":"https://www.ijongno.co.kr/fmcs/41","fac_desc":"<div><span style=\"font-size: 14pt;\">광화문아트홀은 종로구시설관리공단내에 위치한 공연장입니다.(총면적 445.63제곱미터)</span></div><div><span style=\"font-size: 12px;\"><br></span></div><div><span style=\"font-size: 14pt;\">객석수 : 326석(1층 277 장애인4석 포함, 2층 45)</span></div><div><span style=\"font-size: 14pt;\">무대시설 : 무대넓이112㎡(14m*8m), 높이8.5m</span></div><div><span style=\"font-size: 14pt;\">음향시설 : 음향믹스(24CH), 엠프 메인스피커 등</span></div><div><span style=\"font-size: 14pt;\">조명시설 : 조명콘솔(48CH),무빙라이트, 핀조명, 퍼넬, 엘립소이달 등</span></div>","num":49,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-6048-1266","fac_name":"광화문아트홀"},
+                {"y_coord":"126.96435708849","main_img":"https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000100425&thumb=Y","addr":"서울특별시 종로구 인왕산로1길 25","x_coord":"37.5734632504819","open_day":null,"seat_cnt":null,"yellow":null,"etc_desc":"■ 대지 704평, 연건평 1,038평(지상5층, 지하1층)","airport":null,"entr_fee":"0","subway":null,"busstop":null,"closeday":"토/일요일, 공휴일, 근로자의 날 기타 관장이 필요하다고 인정하는 날","fax":null,"green":null,"subjcode":"도서관","homepage":"https://www.ekssl.or.kr/main/main/main.do","fac_desc":"<p><span style=\"font-size: 12pt;\">한국사회과학도서관은 사회과학자들의 연구를 지원하는 전문 정보센터 역할을 수행할 목적으로 ㈜에스콰이아 그룹의 고 이인표 명예회장께서 (재)에스콰이아학술문화재단을 통하여 1983년 5월에 설립되었습니다.\r\n</span></p><p><span style=\"font-size: 12pt;\"><br></span></p><p><span style=\"font-size: 12pt;\">\r\n■ 이용시간 : 09:00~18:00</span></p><p><span style=\"font-size: 12pt;\">■ 시설현황 : 연구자료실, 일반자료실, 어린이자료실, 프로그램실</span></p><div><span style=\"font-size: 12pt;\"><br></span></div><p><br></p>","num":54,"red":null,"openhour":null,"entrfree":"무료","blue":null,"phne":"02-767-9500","fac_name":"한국사회과학도서관"},
+
+                ]}
+
+
+        // console.log(file.DATA[0].subjcode);
+        // console.log(file.DATA.length);
+
+        let cnt = 0;
+
+        function list(find1=null, find2=null, word=null){
+            let header = '<li class="stand"><p>번호</p><p>주제분류</p><p>문화시설명</p><p>주소</p><p>전화번호</p></li>'
+            document.querySelector('.list ul').innerHTML = header;
+            if(find1 == null && find2 == null && word == null){
+                for(let i=0; i <file.DATA.length; i++){
+                    // str1 = `<li style='order:${file.DATA[i].num};'>`
+                    str1 = `<li style='order:${i+1}' data-num='${file.DATA[i].num}'>`
+                    // strNum = `<p>${file.DATA[i].num}</p>`;
+                    strNum = `<p>${i+1}</p>`;
+                    strSubj = `<p>${file.DATA[i].subjcode}</p>`;
+                    strFac_name = `<p>${file.DATA[i].fac_name}</p>`;
+                    strAddr = `<p>${file.DATA[i].addr}</p>`;
+                    strPhne = `<p>${file.DATA[i].phne}</p>`;
+                    str2 = "</li>"
+        
+                    document.querySelector('.list ul').innerHTML += str1 + strNum + strSubj + strFac_name + strAddr + strPhne + str2;
+
+                    cnt = 0;
+                };
+
+                let pagenum = Math.ceil($('.list li:not(.stand)').length / 10);
+
+
+                click();
+            }else{
+                cnt = 0;
+
+                for(item of file.DATA){
+                    if(item.subjcode.includes(find1) && item.addr.includes(find2) && item.fac_name.includes(word)){
+                        str1 = `<li style='order:${cnt+1}' data-num='${item.num}'>`
+                        strNum = `<p>${cnt+1}</p>`;
+                        strSubj = `<p>${item.subjcode}</p>`;
+                        strFac_name = `<p>${item.fac_name}</p>`;
+                        strAddr = `<p>${item.addr}</p>`;
+                        strPhne = `<p>${item.phne}</p>`;
+                        str2 = "</li>"
+            
+                        document.querySelector('.list ul').innerHTML += str1 + strNum + strSubj + strFac_name + strAddr + strPhne + str2;
+                        
+                        cnt++;
+                    }
+                }
+                
+                if($('.list li').length == 1){
+                    document.querySelector('.list ul').innerHTML += '<h3 class="nosearch">검색 결과가 없습니다.</h3>'
+                }
+                // for(item of file.DATA){
+                //     // console.log(item.subjcode);
+                //     if(item.subjcode == code){
+                //         // console.log(item.subjcode);
+                //     }
+                // };
+
+
+                click();
+            }
+        };
+
+        list();
+        click();
+
+        function click(){
+            document.querySelectorAll('.list li:not(:nth-child(1))').forEach(list =>{
+                list.addEventListener('click',function(){
+                    document.querySelector('.popBg').style.display = "block";
+                    document.querySelector('.pop').style.display = "block";
+    
+                    // var listNum = Number(this.querySelector('p:nth-child(1)').textContent) - 1;
+                    var listNum = Number($(this).data('num'));
+    
+                    let result = $.grep(file.DATA, function(e){
+                        return e.num == listNum;
+                    })[0];
+
+                    if(result){
+                        var imgUrl = result.main_img;
+                        document.querySelector('.profile .img').style.background = `url(${imgUrl}) center/contain no-repeat`;
+        
+                        var pageUrl = result.homepage;
+                        document.querySelector('.info .link a').href = pageUrl;
+        
+                        var infos = ["subjcode", "fac_name", "addr", "open_day", "openhour", "entrfree", "entr_fee", "phne", "closeday", "etc_desc"]
+        
+                        for(const property in infos){
+                            // console.log(`${infos[property]}`);
+                            
+                            str = result[infos[property]];
+        
+                            if(str){
+                                document.querySelector(`.${infos[property]}`).textContent = str;
+                            }else{
+                                document.querySelector(`.${infos[property]}`).innerHTML = '<span class="noinfo">정보없음</span>';
+                            }
+                        }
+                    }
+    
+    
+                    // var strSubj = file.DATA[listNum].subjcode;
+                    // var strName = file.DATA[listNum].fac_name;
+                    // var strAddr = file.DATA[listNum].addr;
+    
+                    // var strOpenDay = file.DATA[listNum].open_day;
+                    // var strOpenHour = file.DATA[listNum].openhour;
+                    // var strFee = file.DATA[listNum].entrfree;
+                    // var strEntrfee = file.DATA[listNum].entr_fee;
+                    // var strPhne = file.DATA[listNum].phne;
+                    // var strClose = file.DATA[listNum].closeday;
+                    // var strEtc = file.DATA[listNum].etc_desc;
+    
+                    // document.querySelector('.profile .subjcode').textContent = strSubj;
+                    // document.querySelector('.profile .fac_name').textContent = strName;
+                    // document.querySelector('.profile .addr').textContent = strAddr;
+    
+    
+                })
+            })
+        }
+
+
+        document.querySelector('.close').addEventListener('click',()=>{
+            document.querySelector('.popBg').style.display = "none";
+            document.querySelector('.pop').style.display = "none";
+        })
+        document.querySelector('.popBg').addEventListener('click',()=>{
+            document.querySelector('.popBg').style.display = "none";
+            document.querySelector('.pop').style.display = "none";
+        })
+
+        $('.btn').on('click', ()=>{
+            let find1 = $('#subjcode').val();
+            let find2 = $('#addr').val();
+            let word = $('#fac_name').val();
+
+            list(find1, find2, word);
+        })
+
+
+    </script>
+  </body>
+</html>
