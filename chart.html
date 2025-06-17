@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="jquery-3.7.1.min.js"></script>
+    <script>
+        $(()=>{
+            for(let i = 0; i < $('dd').length; i++){
+                $('.total').eq(i).text(Number($(`#a${i+1}`).val())*Number($(`#b${i+1}`).val()));
+            }
+
+            $('dd input').on('change',function(){
+                let index = Number($(this).closest('dd').index()) - 1;
+                $('.total').eq(index).text(Number($(`#a${index+1}`).val()) * Number($(`#b${index+1}`).val()));
+            })
+
+            let ctx = document.querySelector('#can').getContext('2d');
+            let cnt1 = ['1,600', '1,400', '1,200', '1,000', 800, 600, 400, 200, 0];
+            let cnt2 = ['25,000,000', '20,000,000', '15,000,000', '10,000,000', '5,000,000', 0];
+
+            function setting(){
+                ctx.font = 'bold 20px NanumGothic';
+                ctx.fillStyle = 'black';
+                ctx.fillText('상품별 매출 현황', 75, 40);
+                
+                ctx.font = '16px NanumGothic';
+                ctx.fillStyle = 'gray';
+                ctx.fillText('판매량', 170, 75);
+                ctx.fillText('총판매액', 170, 105);
+    
+                ctx.font = '14px NanumGothic';
+                for(let i = 0; i < cnt1.length; i++){
+                    if(i < 4){
+                        ctx.fillText(cnt1[i], 80, 145+50*i);
+                    }else if(i > 3 && i < 8){
+                        ctx.fillText(cnt1[i], 92, 145+50*i);
+                    }else{
+                        ctx.fillText(cnt1[i], 108, 145+50*i);
+                    }
+                }
+                for(let i = 0; i < cnt2.length; i++){
+                    ctx.fillText(cnt2[i], 782, 145+80*i);
+                }
+    
+                ctx.fillStyle = 'deepskyblue';
+                ctx.fillRect(130,65,30,10);
+                ctx.fillStyle = 'orangered';
+                ctx.fillRect(130,98,30,4);
+                ctx.beginPath();
+                ctx.arc(145,100,5,0,3.14*2,false);
+                ctx.fill();
+                ctx.closePath();
+
+                ctx.font = 'bold 16px NanumGothic';
+                ctx.fillStyle = 'black';
+                ctx.fillText('A', 176, 575);
+                ctx.fillText('B', 285, 575);
+                ctx.fillText('C', 392, 575);
+                ctx.fillText('D', 498, 575);
+                ctx.fillText('E', 605, 575);
+                ctx.fillText('F', 712, 575);
+
+                ctx.beginPath();
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = 'gray'
+                ctx.moveTo(130, 130);
+                ctx.lineTo(130, 550);
+                ctx.stroke();
+                ctx.closePath();
+
+                ctx.beginPath();
+                ctx.moveTo(770, 130);
+                ctx.lineTo(770, 550);
+                ctx.stroke();
+                ctx.closePath();
+
+                for(let i = 0; i < 9; i++){
+                    ctx.beginPath();
+                    ctx.moveTo(130, 140+50*i);
+                    ctx.lineTo(770, 140+50*i);
+                    ctx.stroke();
+                    ctx.closePath();
+                }
+                
+                for(let i = 1; i <= 5; i++){
+                    ctx.beginPath();
+                    ctx.moveTo(130+106.6*i, 540);
+                    ctx.lineTo(130+106.6*i, 550);
+                    ctx.stroke();
+                    ctx.closePath();
+                }
+            }
+
+
+            setting();
+
+
+            function fnR(index, h){
+                let sR = 0;
+                // ctx.fillStyle = 'deepskyblue';
+                // ctx.fillRect(170.5+106*index, 540-h, 25, h);
+                let fnRD = setInterval(() => {
+                    if(sR < h){
+                        ctx.fillStyle = 'deepskyblue';
+                        ctx.fillRect(170.5+106*index, 540 - sR, 25, sR);
+                        sR++;
+                    }else{
+                        clearInterval(fnRD);
+                    }
+                }, 1);
+            };
+
+            function fnL(h1, h2, h3, h4, h5, h6){
+                setTimeout(() => {
+                    ctx.beginPath();
+                    ctx.fillStyle = 'orangered'
+                    ctx.arc(183, h1, 5, 0, 3.14*2, false);
+                    ctx.fill();
+                    ctx.closePath();
+                    
+                    ctx.beginPath();
+                    ctx.arc(289, h2, 5, 0, 3.14*2, false);
+                    ctx.fill();
+                    ctx.closePath();
+                    
+                    ctx.beginPath();
+                    ctx.arc(395, h3, 5, 0, 3.14*2, false);
+                    ctx.fill();
+                    ctx.closePath();
+    
+                    ctx.beginPath();
+                    ctx.arc(501, h4, 5, 0, 3.14*2, false);
+                    ctx.fill();
+                    ctx.closePath();
+    
+                    ctx.beginPath();
+                    ctx.arc(607, h5, 5, 0, 3.14*2, false);
+                    ctx.fill();
+                    ctx.closePath();
+    
+                    ctx.beginPath();
+                    ctx.arc(713, h6, 5, 0, 3.14*2, false);
+                    ctx.fill();
+                    ctx.closePath();
+                }, 1500);
+
+                // let sP
+                // ctx.beginPath();
+                // ctx.lineWidth = 3;
+                // ctx.strokeStyle = 'orangered';
+                // ctx.moveTo(183, h1);
+                // setInterval(() => {
+                //     ctx.lineTo(289, h2);
+                // }, 10);
+                // ctx.lineTo(395, h3);
+                // ctx.lineTo(501, h4);
+                // ctx.lineTo(607, h5);
+                // ctx.lineTo(713, h6);
+                // ctx.stroke();
+                // ctx.closePath();
+
+                let h = [h1, h2, h3, h4, h5, h6];
+                let lines = [];
+                let drawn = [];
+
+                for(let i = 0; i < h.length - 1; i++){
+                    let set = {start: {x: 183+106*i, y: h[i]}, end: {x: 183+106*(i+1), y: h[i+1]}};
+                    lines.push(set);
+                }
+
+                let steps = 30;
+
+                fnP(0);
+
+                function fnP(index){
+                    if(index >= lines.length) return;
+
+                    let line = lines[index];
+                    let dx = (line.end.x - line.start.x) / steps;
+                    let dy = (line.end.y - line.start.y) / steps;
+
+                    let current = {x: line.start.x, y: line.start.y};
+                    let step = 0;
+
+                    let draw = setInterval(() => {
+                        // ctx.clearRect(0, 0, 900, 600);
+
+                        for(let d of drawn){
+                            ctx.beginPath();
+                            ctx.lineWidth = 3;
+                            ctx.strokeStyle = 'orangered';
+                            ctx.moveTo(d.start.x, d.start.y);
+                            ctx.lineTo(d.end.x, d.end.y);
+                            ctx.stroke();
+                        }
+                        
+                        ctx.beginPath();
+                        ctx.lineWidth = 3;
+                        ctx.strokeStyle = 'orangered';
+                        ctx.moveTo(line.start.x, line.start.y);
+                        ctx.lineTo(current.x, current.y);
+                        ctx.stroke();
+
+                        current.x += dx;
+                        current.y += dy;
+                        step++;
+
+                        if(step >= steps){
+                            clearInterval(draw);
+                            drawn.push(line);
+                            fnP(index+1);
+                        }
+                    }, 10);
+                }
+            };
+            
+
+            
+            $('.btn').on('click',()=>{
+                ctx.clearRect(0, 0, 900, 600);
+                setting();
+
+                for(let i = 1; i <= 6; i++){
+                    let h = Number($(`#b${i}`).val())*0.25;
+                    fnR(i-1, h);
+                }
+                
+                let arr = [];
+                for(let i = 0; i < $('dd').length; i++){
+                    let h = 540 - (Number($('dd').eq(i).find('.total').text()) * 0.000016);
+                    arr.push(h);
+                }
+                fnL(arr[0], arr[1], arr[2], arr[3], arr[4], arr[5]);
+
+                let high = arr.indexOf(Math.min(...arr));
+
+                fnT(high, Math.min(...arr));
+            });
+
+            function fnT(index, h){
+                setTimeout(() => {
+                    ctx.font = 'bold 20px NanumGothic';
+                    ctx.fillStyle = 'orangered';
+                    ctx.fillText('매출 1위', 145+index*106, h-30);
+                }, 1500);
+            };
+            
+            $('.reset').on('click',()=>{
+                ctx.clearRect(0, 0, 900, 600);
+                setting();
+            })
+        });
+
+    </script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .wrap{
+            width: 900px;
+            margin: auto;
+            padding-bottom: 20px;
+        }
+        #can{
+            border: 2px solid lightgray;
+        }
+        .wrap h2{
+            text-align: center;
+            margin-top: 20px;
+        }
+        .wrap .caption{
+            text-align: right;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .wrap dl{
+            width: 750px;
+            margin: auto;
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+        }
+        .wrap dt{
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .wrap dt p{
+            width: 25%;
+            line-height: 40px;
+            text-align: center;
+            background-color: darkcyan;
+            color: whitesmoke;
+            font-weight: bold;
+            border-right: 1px solid white;
+            border-bottom: 1px solid black;
+        }
+        .wrap dt p:last-child{
+            border-right: 0;
+        }
+        .wrap dd{
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .wrap dd p{
+            width: 25%;
+            line-height: 40px;
+            text-align: right;
+            border: 1px solid rgb(236, 236, 236);
+            text-align: right;
+            box-sizing: border-box;
+            padding-right: 10px;
+        }
+        .wrap dd p:last-child{
+            border-right: 0;
+        }
+        .wrap dd p:first-child{
+            border-left: 0;
+            text-align: center;
+        }
+        .wrap dd input{
+            width: 90px;
+            line-height: 25px;
+            box-sizing: border-box;
+            padding-left: 5px;
+            font-size: 16px;
+        }
+        .btns{
+            width: 750px;
+            margin: 10px auto 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            box-sizing: border-box;
+            padding-right: 10px;
+        }
+        .btns button{
+            padding: 8px 12px;
+            text-transform: uppercase;
+            border: 0;
+            outline: 0;
+            margin: 0 4px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btns .btn{
+            background-color: darkcyan;
+            color: white;
+            border: 1px solid darkcyan;
+        }
+        .btns .reset{
+            background-color: white;
+            border: 1px solid darkcyan;
+            color: darkcyan;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <h2>상품별 매출현황 보고서</h2>
+        <p class="caption">&#40;단위 \&#41;</p>
+        <dl>
+            <dt>
+                <p>상품명</p>
+                <p>판매가</p>
+                <p>판매량</p>
+                <p>총판매액</p>
+            </dt>
+            <dd>
+                <p>A</p>
+                <p><input type="number" id="a1" value="15000"></p>
+                <p><input type="number" id="b1" value="1253"></p>
+                <p class="total"></p>
+            </dd>
+            <dd>
+                <p>B</p>
+                <p><input type="number" id="a2" value="16000"></p>
+                <p><input type="number" id="b2" value="1004"></p>
+                <p class="total"></p>
+            </dd>
+            <dd>
+                <p>C</p>
+                <p><input type="number" id="a3" value="17500"></p>
+                <p><input type="number" id="b3" value="987"></p>
+                <p class="total"></p>
+            </dd>
+            <dd>
+                <p>D</p>
+                <p><input type="number" id="a4" value="15500"></p>
+                <p><input type="number" id="b4" value="1352"></p>
+                <p class="total"></p>
+            </dd>
+            <dd>
+                <p>E</p>
+                <p><input type="number" id="a5" value="16500"></p>
+                <p><input type="number" id="b5" value="726"></p>
+                <p class="total"></p>
+            </dd>
+            <dd>
+                <p>F</p>
+                <p><input type="number" id="a6" value="17000"></p>
+                <p><input type="number" id="b6" value="876"></p>
+                <p class="total"></p>
+            </dd>
+        </dl>
+        <div class="btns">
+            <button class="btn">show</button>
+            <button class="reset">reset</button>
+        </div>
+        <canvas id="can" width="900px" height="600px"></canvas>
+    </div>
+</body>
+</html>
