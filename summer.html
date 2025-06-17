@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="jquery-3.7.1.min.js"></script>
+    <script src="summer.js" defer></script>
+    <script src="summerGraph.js" defer></script>
+    <link rel="stylesheet" href="summer.css">
+</head>
+<body>
+    <div class="wrap">
+        <aside>
+            <div class="logo">
+                <h2>cite logo</h2>
+            </div>
+            <ul>
+                <li class="on">홈</li>
+                <li>강좌 관리</li>
+                <li>강사 관리</li>
+                <li>회원 관리</li>
+                <li>QnA 관리</li>
+            </ul>
+        </aside>
+        <main>
+            <div class="home page">
+                <section>
+                    <canvas id="can1" width="1000px" height="300px"></canvas>
+                    <!-- 방문자현황 -->
+                    <canvas id="can2" width="1000px" height="300px"></canvas>
+                    <!-- 강좌별신청자수 -->
+                </section>
+                <ul class="summary">
+                    <li>
+                        <h2>강좌 목록</h2>
+                        <span class="more">더보기 &gt;</span>
+                        <dl class="classSum">
+                            <dt>
+                                <p>강좌명</p>
+                                <p>개강일</p>
+                                <p>정원</p>
+                            </dt>
+                            <!-- <dd>
+                                <p>주말헬스(청소년)</p>
+                                <p>2023-09-01</p>
+                                <p>2/80</p>
+                            </dd> -->
+                        </dl>
+                    </li>
+                    <!-- 강좌 목록 바로가기 -->
+                    <li>
+                        <h2>회원 목록</h2>
+                        <span class="more">더보기 &gt;</span>
+                        <dl class="memberSum">
+                            <dt>
+                                <p>회원번호</p>
+                                <p>이름</p>
+                                <p>연락처</p>
+                            </dt>
+                            <!-- <dd>
+                                <p>TY009</p>
+                                <p>최윤성</p>
+                                <p>031-3436-2357</p>
+                            </dd> -->
+                        </dl>
+                    </li>
+                    <!-- 회원 목록 바로가기 -->
+                    <li>
+                        <h2>QnA</h2>
+                        <span class="more">더보기 &gt;</span>
+                        <dl class="QnaSum">
+                            <dt>
+                                <p>순번</p>
+                                <p>제목</p>
+                                <p>작성자</p>
+                                <p>작성일</p>
+                            </dt>
+                            <dd>
+                                <p>1</p>
+                                <p>로그인이 안됩니다</p>
+                                <p>김바다</p>
+                                <p>2025.05.29</p>
+                            </dd>
+                        </dl>
+                    </li>
+                    <!-- QnA 바로가기 -->
+                </ul>
+            </div>
+            <div class="class page">
+                <h1>강좌 관리</h1>
+                <div class="lists">
+                    <h2>강좌 목록</h2>
+                    <dl class="list">
+                        <dt>
+                            <p>강좌 코드</p>
+                            <p>강좌명</p>
+                            <p>개강일</p>
+                            <p>기간</p>
+                            <p>수강료</p>
+                            <p>강사</p>
+                            <p>정원</p>
+                        </dt>
+                        <!-- <dd>
+                            <p>D001</p>
+                            <p>주말헬스(청소년)</p>
+                            <p>2023-09-01</p>
+                            <p>12개월</p>
+                            <p>\12,000</p>
+                            <p>김진영</p>
+                            <p>80</p>
+                        </dd> -->
+                    </dl>
+                    <div class="search">
+                        <select id="find">
+                            <option value="CODE">강좌 코드</option>
+                            <option value="TITLE">강좌명</option>
+                            <option value="DATE">개강일</option>
+                            <option value="PERIOD">기간</option>
+                            <option value="PRICE">수강료</option>
+                            <option value="TEACHERNO">강사</option>
+                            <option value="LIMIT">정원</option>
+                        </select>
+                        <input type="text" id="word">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="searchbtn"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
+                    </div>
+                </div>
+                <div class="newlists">
+
+                    <h2>신규 강좌 등록</h2>
+                    <dl class="newlist">
+                        <dt>
+                            <p>강좌명</p>
+                            <p>개강일</p>
+                            <p>기간</p>
+                            <p>수강료</p>
+                            <p>강사</p>
+                            <p>정원</p>
+                            <p></p>
+                        </dt>
+                        <dd>
+                            <p><input type="text" name="Ntitle" id="Ntitle"></p>
+                            <p><input type="date" name="Ndate" id="Ndate"></p>
+                            <p><select name="Nperiod" id="Nperiod">
+                                <option value="">선택</option>
+                                <option value="3">3개월</option>
+                                <option value="6">6개월</option>
+                                <option value="12">12개월</option>
+                            </select></p>
+                            <p><input type="text" name="Nprice" id="Nprice"></p>
+                            <p><select name="Nteacher" id="Nteacher">
+                                <option value="">선택</option>
+                            </select></p>
+                            <p><input type="text" name="Nlimit" id="Nlimit"></p>
+                            <p><button class="CNsave">등록</button></p>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="teacher page"></div>
+            <div class="member page"></div>
+            <div class="qa page"></div>
+        </main>
+    </div>
+</body>
+</html>
